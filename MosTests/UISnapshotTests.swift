@@ -13,7 +13,8 @@ final class UISnapshotTests: XCTestCase {
 
     private let outputDirectory = URL(fileURLWithPath: "/tmp/MosSnapshots", isDirectory: true)
     private let applicationPaths = ["/System/Library/CoreServices/Finder.app", "/System/Applications/Calendar.app", "/System/Applications/Notes.app"]
-    private let device = ScrollDevice(vendorID: 0x19f5, productID: 0x3246, name: "NuPhy Air75 V2")
+    private let device = ScrollDevice(vendorID: 0x046d, productID: 0xb037, name: "MX Anywhere 3S")
+    private let disabledDevice = ScrollDevice(vendorID: 0x3299, productID: 0x4e6b, name: "ProtoArc Keyboard Touchpad")
     private var savedReverse = true
     private var windows: [NSWindow] = []
 
@@ -29,6 +30,7 @@ final class UISnapshotTests: XCTestCase {
             Options.shared.application.applications.remove(from: path)
         }
         Options.shared.device.devices.remove(from: device.identity)
+        Options.shared.device.devices.remove(from: disabledDevice.identity)
         Options.shared.scroll.reverse = savedReverse
         windows.forEach { $0.close() }
         windows = []
@@ -95,10 +97,12 @@ final class UISnapshotTests: XCTestCase {
         let disabled = Application(path: applicationPaths[2])
         Options.shared.application.applications.append(disabled)
         disabled.disabled = true
-        // 设备: 关闭翻转
+        // 设备: 鼠标关闭翻转; 带触摸板的键盘停用 Mos
         Options.shared.device.devices.append(device)
         device.beginOverriding([.reverse])
         device.scroll.reverse = false
+        Options.shared.device.devices.append(disabledDevice)
+        disabledDevice.disabled = true
     }
 
     private func makeOverridesController() -> PreferencesApplicationViewController {
@@ -138,10 +142,19 @@ final class UISnapshotTests: XCTestCase {
         RunLoop.main.run(until: Date().addingTimeInterval(0.5))
         let view = controller.view
         view.layoutSubtreeIfNeeded()
-        guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else {
+        // 2x 渲染, 便于在文档中清晰展示
+        let scale: CGFloat = 2
+        guard let rep = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: Int(view.bounds.width * scale),
+            pixelsHigh: Int(view.bounds.height * scale),
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+            colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
+        ) else {
             XCTFail("cannot render \(name)")
             return
         }
+        rep.size = view.bounds.size
         view.cacheDisplay(in: view.bounds, to: rep)
         let url = outputDirectory.appendingPathComponent("\(name).png")
         XCTAssertNoThrow(try rep.representation(using: .png, properties: [:])?.write(to: url))
