@@ -104,8 +104,14 @@ class ScrollCore: ScrollActionPort {
         var step = Options.shared.scroll.step,
             speed = Options.shared.scroll.speed,
             duration = Options.shared.scroll.durationTransition
-        // 白名单模式下, 未列出的应用不做处理
-        if ScrollCore.shared.application != nil || !Options.shared.application.allowlist {
+        // 已停用的应用/设备, 以及白名单模式下未列出的应用/设备不做处理
+        let isActive = ScrollOptionsResolver.isActive(
+            application: ScrollCore.shared.application,
+            device: ScrollCore.shared.device,
+            applicationAllowlist: Options.shared.application.allowlist,
+            deviceAllowlist: Options.shared.device.allowlist
+        )
+        if isActive {
             // 按设定项合并: 全局 → 例外应用 → 例外设备
             let resolved = ScrollOptionsResolver.resolve(
                 application: ScrollCore.shared.application,

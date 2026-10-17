@@ -144,6 +144,13 @@ enum ScrollOptionsResolver {
         return values
     }
 
+    /// Mos 是否处理该事件: 应用与设备需各自通过 (未列出时取决于白名单模式, 列出时取决于是否停用)
+    static func isActive(application: Application?, device: ScrollDevice?, applicationAllowlist: Bool, deviceAllowlist: Bool) -> Bool {
+        let applicationActive = application.map { !$0.disabled } ?? !applicationAllowlist
+        let deviceActive = device.map { !$0.disabled } ?? !deviceAllowlist
+        return applicationActive && deviceActive
+    }
+
     static func resolve(application: Application?, device: ScrollDevice?) -> ScrollValues {
         return resolve(global: Options.shared.scroll, layers: [application, device])
     }

@@ -137,6 +137,36 @@ final class ScrollProfileResolutionTests: XCTestCase {
         XCTAssertEqual(makeDevice().identity, "046d:b034")
     }
 
+    // MARK: - 停用与白名单
+
+    func testUnlistedEntriesFollowAllowlistMode() {
+        XCTAssertTrue(ScrollOptionsResolver.isActive(application: nil, device: nil, applicationAllowlist: false, deviceAllowlist: false))
+        XCTAssertFalse(ScrollOptionsResolver.isActive(application: nil, device: nil, applicationAllowlist: true, deviceAllowlist: false))
+        XCTAssertFalse(ScrollOptionsResolver.isActive(application: nil, device: nil, applicationAllowlist: false, deviceAllowlist: true))
+    }
+
+    func testDisabledEntryTurnsMosOff() {
+        let application = makeApplication()
+        let device = makeDevice()
+        XCTAssertTrue(ScrollOptionsResolver.isActive(application: application, device: device, applicationAllowlist: true, deviceAllowlist: true))
+        device.disabled = true
+        XCTAssertFalse(ScrollOptionsResolver.isActive(application: application, device: device, applicationAllowlist: false, deviceAllowlist: false), "a disabled device wins over an enabled app")
+        device.disabled = false
+        application.disabled = true
+        XCTAssertFalse(ScrollOptionsResolver.isActive(application: application, device: device, applicationAllowlist: false, deviceAllowlist: false), "a disabled app wins over an enabled device")
+    }
+
+    func testDisabledFlagRoundTrip() throws {
+        let application = makeApplication()
+        application.disabled = true
+        let device = makeDevice()
+        device.disabled = true
+        XCTAssertTrue(try JSONDecoder().decode(Application.self, from: JSONEncoder().encode(application)).disabled)
+        XCTAssertTrue(try JSONDecoder().decode(ScrollDevice.self, from: JSONEncoder().encode(device)).disabled)
+        let legacy = #"{"path":"/Applications/A.app","inherit":true}"#
+        XCTAssertFalse(try JSONDecoder().decode(Application.self, from: Data(legacy.utf8)).disabled)
+    }
+
     // MARK: - 持久化
 
     func testLegacyApplicationJSONDecodesToAllOrNothing() throws {

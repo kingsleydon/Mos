@@ -117,7 +117,7 @@ class ScrollUtils {
         return nil
     }
 
-    // 从 Devices 中取回产生该事件的设备的例外设置; 未配置任何设备时跳过识别
+    // 从 Devices 中取回产生该事件的设备的例外设置; 未配置任何设备时跳过识别 (此时设备白名单下也不会命中)
     func getTargetDevice(from event: CGEvent) -> ScrollDevice? {
         let devices = Options.shared.device.devices
         guard devices.count > 0 else { return nil }

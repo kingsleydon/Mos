@@ -90,9 +90,13 @@ class PreferencesApplicationViewController: NSViewController {
         }
     }
 
-    // 白名单模式
+    // 白名单模式 (应用与设备各自独立)
     @IBAction func allowListModeClick(_ sender: NSButton) {
-        Options.shared.application.allowlist = sender.state.rawValue==0 ? false : true
+        let isOn = sender.state.rawValue != 0
+        switch mode {
+        case .applications: Options.shared.application.allowlist = isOn
+        case .devices: Options.shared.device.allowlist = isOn
+        }
         syncViewWithOptions()
     }
 
@@ -205,9 +209,10 @@ extension PreferencesApplicationViewController {
 extension PreferencesApplicationViewController {
     // 同步界面与设置参数
     func syncViewWithOptions() {
-        // 白名单仅作用于应用
-        allowlistModeCheckBox.state = NSControl.StateValue(rawValue: Options.shared.application.allowlist ? 1 : 0)
-        allowlistModeCheckBox.isHidden = mode != .applications
+        // 白名单: 应用与设备各自独立; 说明弹窗内容仅针对应用
+        let allowlist = mode == .applications ? Options.shared.application.allowlist : Options.shared.device.allowlist
+        allowlistModeCheckBox.state = NSControl.StateValue(rawValue: allowlist ? 1 : 0)
+        allowlistModeCheckBox.toolTip = mode == .applications ? nil : NSLocalizedString("overridesDeviceAllowlistTooltip", comment: "Tooltip of the allow list checkbox in the device list")
         allowlistHelpButton?.isHidden = mode != .applications
         updateModeTexts()
     }
@@ -282,12 +287,14 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
                     guard let application = Options.shared.application.applications.get(by: row) else { return nil }
                     cell.imageView?.image = application.getIcon()
                     cell.imageView?.toolTip = application.path
-                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(application.getName(), summary: application.overrideSummary())
+                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(application.getName(), summary: application.overrideSummary(), disabled: application.disabled)
+                    updateEnabledCheckBox(in: cell, row: row, disabled: application.disabled)
                 case .devices:
                     guard let device = Options.shared.device.devices.get(by: row) else { return nil }
                     cell.imageView?.image = PreferencesApplicationViewController.deviceIcon()
                     cell.imageView?.toolTip = device.identity
-                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(device.getName(), summary: device.overrideSummary())
+                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(device.getName(), summary: device.overrideSummary(), disabled: device.disabled)
+                    updateEnabledCheckBox(in: cell, row: row, disabled: device.disabled)
                 }
                 return cell
             // 设定: 滚动
@@ -301,13 +308,14 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         }
         return nil
     }
-    /// 名称 + 覆盖摘要 (次要文字色)
-    private static func title(_ name: String, summary: String) -> NSAttributedString {
+    /// 名称 + 覆盖摘要 (次要文字色); 停用时名称变灰, 摘要显示为已停用
+    private static func title(_ name: String, summary: String, disabled: Bool) -> NSAttributedString {
         let result = NSMutableAttributedString(string: name, attributes: [
             .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
-            .foregroundColor: NSColor.controlTextColor,
+            .foregroundColor: disabled ? NSColor.disabledControlTextColor : NSColor.controlTextColor,
         ])
-        result.append(NSAttributedString(string: "  " + summary, attributes: [
+        let detail = disabled ? NSLocalizedString("overridesSummaryDisabled", comment: "Summary for an override entry where Mos is turned off") : summary
+        result.append(NSAttributedString(string: "  " + detail, attributes: [
             .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
             .foregroundColor: NSColor.secondaryLabelColor,
         ]))
@@ -316,6 +324,44 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         result.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: result.length))
         return result
     }
+    /// 行首的启用开关 (Cell 会复用, 首次使用时创建)
+    private func updateEnabledCheckBox(in cell: NSTableCellView, row: Int, disabled: Bool) {
+        let identifier = NSUserInterfaceItemIdentifier("overrideEnabledCheckBox")
+        let checkBox: NSButton
+        if let existing = cell.subviews.first(where: { $0.identifier == identifier }) as? NSButton {
+            checkBox = existing
+        } else {
+            checkBox = NSButton(checkboxWithTitle: "", target: self, action: #selector(entryEnabledClick(_:)))
+            checkBox.identifier = identifier
+            checkBox.translatesAutoresizingMaskIntoConstraints = false
+            cell.addSubview(checkBox)
+            var constraints = [checkBox.centerYAnchor.constraint(equalTo: cell.centerYAnchor)]
+            if let imageView = cell.imageView {
+                constraints.append(checkBox.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: -2))
+            } else {
+                constraints.append(checkBox.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 2))
+            }
+            NSLayoutConstraint.activate(constraints)
+        }
+        checkBox.tag = row
+        checkBox.state = disabled ? .off : .on
+        checkBox.toolTip = mode == .applications
+            ? NSLocalizedString("overridesEnableApplicationTooltip", comment: "Tooltip of the checkbox that turns Mos on or off for an application")
+            : NSLocalizedString("overridesEnableDeviceTooltip", comment: "Tooltip of the checkbox that turns Mos on or off for a device")
+    }
+
+    @objc private func entryEnabledClick(_ sender: NSButton) {
+        let row = sender.tag
+        let disabled = sender.state == .off
+        switch mode {
+        case .applications:
+            Options.shared.application.applications.get(by: row)?.disabled = disabled
+        case .devices:
+            Options.shared.device.devices.get(by: row)?.disabled = disabled
+        }
+        tableView.reloadData(forRowIndexes: [row], columnIndexes: [0])
+    }
+
     // 行高
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
         return 30

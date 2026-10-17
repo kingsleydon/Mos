@@ -48,6 +48,7 @@ struct OptionItem {
     }
 
     struct Device {
+        static let Allowlist = "deviceAllowlist"
         static let Devices = "devices"
     }
 }
@@ -253,6 +254,7 @@ extension Options {
         application.allowlist = UserDefaults.standard.bool(forKey: OptionItem.Application.Allowlist)
         application.applications = loadApplicationsData()
         // 设备
+        device.allowlist = UserDefaults.standard.bool(forKey: OptionItem.Device.Allowlist)
         device.devices = loadDevicesData()
         // 解锁
         readingOptionsLock = false
@@ -302,6 +304,7 @@ extension Options {
                 NSLog("Failed to serialize applications data, skipping save")
             }
         case .device:
+            UserDefaults.standard.set(device.allowlist, forKey: OptionItem.Device.Allowlist)
             if let devicesData = device.devices.json() {
                 UserDefaults.standard.set(devicesData, forKey: OptionItem.Device.Devices)
             } else {

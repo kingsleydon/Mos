@@ -260,6 +260,9 @@ class OPTIONS_APPLICATION_DEFAULT {
 
 // 例外设备
 class OPTIONS_DEVICE_DEFAULT {
+    var allowlist = false {
+        didSet {Options.shared.markChanged(.device)}
+    }
     var devices = EnhanceArray<ScrollDevice>(
         matchKey: "identity",
         forObserver: {() in Options.shared.markChanged(.device)}

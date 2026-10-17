@@ -18,6 +18,10 @@ class ScrollDevice: Codable, ScrollProfile {
     var displayName: String? = "" {
         didSet { Options.shared.markChanged(.device) }
     }
+    // 配置: 在该设备上停用 Mos
+    var disabled = false {
+        didSet { Options.shared.markChanged(.device) }
+    }
     // 配置: 已覆盖的设定项
     var overrides: Set<ScrollSetting> = [] {
         didSet { Options.shared.markChanged(.device) }
@@ -46,7 +50,7 @@ class ScrollDevice: Codable, ScrollProfile {
 
     // Codable
     private enum CodingKeys: String, CodingKey {
-        case vendorID, productID, name, displayName, overrides, scroll
+        case vendorID, productID, name, displayName, disabled, overrides, scroll
     }
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -55,6 +59,7 @@ class ScrollDevice: Codable, ScrollProfile {
         identity = ScrollDevice.identity(vendorID: vendorID, productID: productID)
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
         displayName = try container.decodeIfPresent(String.self, forKey: .displayName) ?? ""
+        disabled = try container.decodeIfPresent(Bool.self, forKey: .disabled) ?? false
         let rawOverrides = try container.decodeIfPresent([String].self, forKey: .overrides) ?? []
         overrides = Set(rawOverrides.compactMap { ScrollSetting(rawValue: $0) })
         scroll = try container.decodeIfPresent(OPTIONS_SCROLL_DEFAULT.self, forKey: .scroll) ?? OPTIONS_SCROLL_DEFAULT()
@@ -65,6 +70,7 @@ class ScrollDevice: Codable, ScrollProfile {
         try container.encode(productID, forKey: .productID)
         try container.encode(name, forKey: .name)
         try container.encodeIfPresent(displayName, forKey: .displayName)
+        try container.encode(disabled, forKey: .disabled)
         try container.encode(overrides.map { $0.rawValue }.sorted(), forKey: .overrides)
         try container.encode(scroll, forKey: .scroll)
     }

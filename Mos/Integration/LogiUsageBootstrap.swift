@@ -76,7 +76,7 @@ enum LogiUsageBootstrap {
             case .block:  return .block
             }
         }()
-        guard app.isOverridden(setting) else { return [] }
+        guard !app.disabled, app.isOverridden(setting) else { return [] }
         let hotkey: ScrollHotkey? = {
             switch role {
             case .dash:   return app.scroll.dash
