@@ -1,0 +1,56 @@
+name: Build Debug App
+
+on:
+  push:
+    branches:
+      - feature/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      # Ad-hoc 签名: 无需开发者证书即可在 Apple Silicon 上运行
+      - name: Build
+        run: |
+          xcodebuild -scheme Debug -configuration Debug \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            build
+
+      - name: Package
+        run: |
+          APP="build/DerivedData/Build/Products/Debug/Mos Debug.app"
+          codesign --verify --verbose "$APP"
+          ditto -c -k --keepParent "$APP" "build/Mos-Debug.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mos-Debug
+          path: build/Mos-Debug.zip
+          retention-days: 14
+
+      - name: Test scroll profile logic
+        run: |
+          xcodebuild -scheme Debug -destination 'platform=macOS' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            test \
+            -only-testing:MosTests/ScrollProfileResolutionTests \
+            -only-testing:MosTests/OptionsChangePropagationTests \
+            -only-testing:MosTests/ScrollTargetApplicationRulesTests \
+            -only-testing:MosTests/ScrollPosterConfigSnapshotTests \
+            -only-testing:MosTests/LogiUsageBootstrapTests \
+            -only-testing:MosTests/UsageRegistryEndToEndTests
