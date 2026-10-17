@@ -343,12 +343,12 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
                     guard let application = Options.shared.application.applications.get(by: row) else { return nil }
                     cell.imageView?.image = application.getIcon()
                     cell.imageView?.toolTip = application.path
-                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(application.getName(), summary: PreferencesApplicationViewController.overrideSummary(for: application), disabled: application.disabled)
+                    PreferencesApplicationViewController.configure(cell, name: application.getName(), summary: PreferencesApplicationViewController.overrideSummary(for: application), disabled: application.disabled)
                 case .devices:
                     guard let device = Options.shared.device.devices.get(by: row) else { return nil }
                     cell.imageView?.image = PreferencesApplicationViewController.deviceIcon()
                     cell.imageView?.toolTip = device.identity
-                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(device.getName(), summary: PreferencesApplicationViewController.overrideSummary(for: device), disabled: device.disabled)
+                    PreferencesApplicationViewController.configure(cell, name: device.getName(), summary: PreferencesApplicationViewController.overrideSummary(for: device), disabled: device.disabled)
                 }
                 return cell
             // 设定: 滚动
@@ -362,22 +362,40 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         }
         return nil
     }
-    /// 名称 + 覆盖摘要 (次要文字色); 停用时名称变灰, 摘要显示为已停用
-    private static func title(_ name: String, summary: String, disabled: Bool) -> NSAttributedString {
-        let result = NSMutableAttributedString(string: name, attributes: [
-            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
-            .foregroundColor: disabled ? NSColor.disabledControlTextColor : NSColor.controlTextColor,
-        ])
-        let detail = disabled ? NSLocalizedString("overridesSummaryDisabled", comment: "Summary for an override entry where Mos is turned off") : summary
-        result.append(NSAttributedString(string: "  " + detail, attributes: [
-            .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
-            .foregroundColor: NSColor.secondaryLabelColor,
-        ]))
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.lineBreakMode = .byTruncatingTail
-        result.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: result.length))
-        return result
+    /// 名称在上, 覆盖摘要在下一行; 停用时名称变灰, 摘要显示为已停用
+    private static func configure(_ cell: NSTableCellView, name: String, summary: String, disabled: Bool) {
+        guard let nameField = cell.textField else { return }
+        nameField.stringValue = name
+        nameField.textColor = disabled ? NSColor.disabledControlTextColor : NSColor.controlTextColor
+        summaryField(in: cell, below: nameField).stringValue = disabled
+            ? NSLocalizedString("overridesSummaryDisabled", comment: "Summary for an override entry where Mos is turned off")
+            : summary
     }
+
+    /// 摘要标签 (Cell 会复用, 首次使用时创建并把名称上移)
+    private static func summaryField(in cell: NSTableCellView, below nameField: NSTextField) -> NSTextField {
+        let identifier = NSUserInterfaceItemIdentifier("overrideSummary")
+        if let existing = cell.subviews.first(where: { $0.identifier == identifier }) as? NSTextField {
+            return existing
+        }
+        let label = NSTextField(labelWithString: "")
+        label.identifier = identifier
+        label.font = NSFont.systemFont(ofSize: NSFont.systemFontSize(for: .small) + 1)
+        label.textColor = NSColor.secondaryLabelColor
+        label.lineBreakMode = .byTruncatingTail
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        cell.addSubview(label)
+        // 两行整体垂直居中
+        cell.constraints.first(where: { $0.firstItem === nameField && $0.firstAttribute == .centerY })?.constant = -8
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: nameField.leadingAnchor),
+            label.trailingAnchor.constraint(lessThanOrEqualTo: cell.trailingAnchor, constant: -5),
+            label.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 1),
+        ])
+        return label
+    }
+
     /// 启用开关单元格 (代码创建, 按列标识复用)
     private func enabledCell(row: Int) -> NSView {
         let identifier = NSUserInterfaceItemIdentifier(CellIdentifiers.enabledCell)
@@ -423,7 +441,7 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
 
     // 行高
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
-        return 30
+        return 44
     }
     // 行数
     func numberOfRows(in tableView: NSTableView) -> Int {
