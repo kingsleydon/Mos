@@ -26,7 +26,7 @@ jobs:
           xcodebuild -scheme Debug -configuration Release \
             -destination 'generic/platform=macOS' \
             -derivedDataPath build/DerivedData \
-            CODE_SIGN_IDENTITY=- 'CODE_SIGN_IDENTITY[sdk=macosx*]=-' CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS=MOS_FORK_BUILD \
             MARKETING_VERSION="${VERSION#v}" \
             build
