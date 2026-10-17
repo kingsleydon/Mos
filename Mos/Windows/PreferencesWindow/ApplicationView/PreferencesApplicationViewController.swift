@@ -77,7 +77,6 @@ class PreferencesApplicationViewController: NSViewController {
     override func viewWillAppear() {
         // 设备可能在面板外被识别, 每次显示时刷新
         tableView.reloadData()
-        DispatchQueue.main.async { [weak self] in self?.alignTableHeadTitle() }
         // 检查表格数据
         toggleNoDataHint()
         // 设置添加按钮回调
@@ -188,7 +187,6 @@ extension PreferencesApplicationViewController {
         mode = nextMode
         tableView.deselectAll(nil)
         tableView.reloadData()
-        DispatchQueue.main.async { [weak self] in self?.alignTableHeadTitle() }
         syncViewWithOptions()
         toggleNoDataHint()
         updateDelButtonState()
@@ -269,22 +267,14 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         }
     }
 
-    /// 表头标题与应用/设备图标左对齐
+    /// 表头标题与应用/设备图标左对齐 (图标在单元格内的边距为 Storyboard 中的 20)
     private func alignTableHeadTitle() {
-        guard let title = tableHeadTitle, let container = title.superview,
+        let applicationColumn = tableView.column(withIdentifier: NSUserInterfaceItemIdentifier(CellIdentifiers.applicationCell))
+        guard let title = tableHeadTitle, let container = title.superview, applicationColumn >= 0,
               let leading = container.constraints.first(where: { $0.firstItem === title && $0.firstAttribute == .leading }) else {
             return
         }
-        let applicationColumn = tableView.column(withIdentifier: NSUserInterfaceItemIdentifier(CellIdentifiers.applicationCell))
-        guard applicationColumn >= 0 else { return }
-        let iconX: CGFloat
-        if tableView.numberOfRows > 0,
-           let imageView = (tableView.view(atColumn: applicationColumn, row: 0, makeIfNecessary: false) as? NSTableCellView)?.imageView {
-            iconX = imageView.convert(imageView.bounds, to: container).minX
-        } else {
-            // 尚无行视图: 按列位置 + 单元格内图标边距 (Storyboard 中为 20) 估算
-            iconX = tableView.convert(tableView.rect(ofColumn: applicationColumn), to: container).minX + 20
-        }
+        let iconX = tableView.convert(tableView.rect(ofColumn: applicationColumn), to: container).minX + 20
         if abs(leading.constant - iconX) > 0.5 {
             leading.constant = iconX
         }

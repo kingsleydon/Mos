@@ -30,6 +30,11 @@ class PreferencesTabViewController: NSTabViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // 不使用更新器的构建: 隐藏更新面板
+        if !UpdateManager.isEnabled,
+           let item = tabViewItems.first(where: { ($0.identifier as? String) == "updates" }) {
+            removeTabViewItem(item)
+        }
         // 覆盖设置 (应用 + 设备): 系统支持时使用分层图标
         if #available(macOS 13.0, *),
            let item = tabViewItems.first(where: { ($0.identifier as? String) == PANEL_IDENTIFIER.application }),

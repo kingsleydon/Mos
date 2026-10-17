@@ -48,6 +48,11 @@ final class ScrollTargetApplicationRulesTests: XCTestCase {
         return application
     }
 
+    /// 滚动路径实际使用的解析结果 (全局 → 应用)
+    private func resolved(_ application: Application) -> ScrollValues {
+        return ScrollOptionsResolver.resolve(application: application, device: nil)
+    }
+
     // MARK: - #1011: 全局关闭时, 按应用开启的规则必须生效
 
     func testPerAppSmoothAppliesWhenGlobalSmoothOff() {
@@ -57,9 +62,9 @@ final class ScrollTargetApplicationRulesTests: XCTestCase {
         let application = makeApplication(inherit: false)
         application.scroll.smooth = true
 
-        XCTAssertTrue(application.isSmooth(false), "per-app smooth=ON must apply when global smooth is OFF (#1011)")
-        XCTAssertTrue(application.isSmoothVertical(false), "per-app axis smooth must not be gated by global axis switches")
-        XCTAssertTrue(application.isSmoothHorizontal(false), "per-app axis smooth must not be gated by global axis switches")
+        XCTAssertTrue(resolved(application).isSmooth(false), "per-app smooth=ON must apply when global smooth is OFF (#1011)")
+        XCTAssertTrue(resolved(application).isSmoothVertical(false), "per-app axis smooth must not be gated by global axis switches")
+        XCTAssertTrue(resolved(application).isSmoothHorizontal(false), "per-app axis smooth must not be gated by global axis switches")
     }
 
     func testPerAppReverseAppliesWhenGlobalReverseOff() {
@@ -69,9 +74,9 @@ final class ScrollTargetApplicationRulesTests: XCTestCase {
         let application = makeApplication(inherit: false)
         application.scroll.reverse = true
 
-        XCTAssertTrue(application.isReverse(), "per-app reverse=ON must apply when global reverse is OFF (#1011)")
-        XCTAssertTrue(application.isReverseVertical(), "per-app axis reverse must not be gated by global axis switches")
-        XCTAssertTrue(application.isReverseHorizontal(), "per-app axis reverse must not be gated by global axis switches")
+        XCTAssertTrue(resolved(application).reverse, "per-app reverse=ON must apply when global reverse is OFF (#1011)")
+        XCTAssertTrue(resolved(application).isReverseVertical(), "per-app axis reverse must not be gated by global axis switches")
+        XCTAssertTrue(resolved(application).isReverseHorizontal(), "per-app axis reverse must not be gated by global axis switches")
     }
 
     // MARK: - #1011 另一半语义: 全局开启时, 按应用关闭的规则也必须生效
@@ -87,11 +92,11 @@ final class ScrollTargetApplicationRulesTests: XCTestCase {
         application.scroll.smooth = false
         application.scroll.reverse = false
 
-        XCTAssertFalse(application.isSmooth(false), "per-app smooth=OFF must disable smoothing when global smooth is ON")
-        XCTAssertFalse(application.isSmoothVertical(false), "per-app smooth=OFF must disable axis smoothing")
-        XCTAssertFalse(application.isSmoothHorizontal(false), "per-app smooth=OFF must disable axis smoothing")
-        XCTAssertFalse(application.isReverseVertical(), "per-app reverse=OFF must disable vertical reverse when global reverse is ON")
-        XCTAssertFalse(application.isReverseHorizontal(), "per-app reverse=OFF must disable horizontal reverse when global reverse is ON")
+        XCTAssertFalse(resolved(application).isSmooth(false), "per-app smooth=OFF must disable smoothing when global smooth is ON")
+        XCTAssertFalse(resolved(application).isSmoothVertical(false), "per-app smooth=OFF must disable axis smoothing")
+        XCTAssertFalse(resolved(application).isSmoothHorizontal(false), "per-app smooth=OFF must disable axis smoothing")
+        XCTAssertFalse(resolved(application).isReverseVertical(), "per-app reverse=OFF must disable vertical reverse when global reverse is ON")
+        XCTAssertFalse(resolved(application).isReverseHorizontal(), "per-app reverse=OFF must disable horizontal reverse when global reverse is ON")
     }
 
     // MARK: - 继承语义: inherit=on 时仍与全局一致
@@ -100,14 +105,14 @@ final class ScrollTargetApplicationRulesTests: XCTestCase {
         Options.shared.scroll.smooth = false
         Options.shared.scroll.reverse = false
         let inheriting = makeApplication(inherit: true)
-        XCTAssertFalse(inheriting.isSmooth(false), "inherit=ON must follow global smooth=OFF")
-        XCTAssertFalse(inheriting.isReverseVertical(), "inherit=ON must follow global reverse=OFF")
+        XCTAssertFalse(resolved(inheriting).isSmooth(false), "inherit=ON must follow global smooth=OFF")
+        XCTAssertFalse(resolved(inheriting).isReverseVertical(), "inherit=ON must follow global reverse=OFF")
 
         Options.shared.scroll.smooth = true
         Options.shared.scroll.reverse = true
         Options.shared.scroll.reverseVertical = true
-        XCTAssertTrue(inheriting.isSmooth(false), "inherit=ON must follow global smooth=ON")
-        XCTAssertTrue(inheriting.isReverseVertical(), "inherit=ON must follow global reverse=ON")
+        XCTAssertTrue(resolved(inheriting).isSmooth(false), "inherit=ON must follow global smooth=ON")
+        XCTAssertTrue(resolved(inheriting).isReverseVertical(), "inherit=ON must follow global reverse=ON")
     }
 
     // MARK: - 独立配置内部的从属关系仍然生效
@@ -121,10 +126,10 @@ final class ScrollTargetApplicationRulesTests: XCTestCase {
         application.scroll.smoothVertical = false
         application.scroll.reverseVertical = false
 
-        XCTAssertFalse(application.isSmoothVertical(false), "own smoothVertical=OFF must disable vertical smoothing")
-        XCTAssertTrue(application.isSmoothHorizontal(false), "own smoothHorizontal default ON must stay ON")
-        XCTAssertFalse(application.isReverseVertical(), "own reverseVertical=OFF must disable vertical reverse")
-        XCTAssertTrue(application.isReverseHorizontal(), "own reverseHorizontal default ON must stay ON")
+        XCTAssertFalse(resolved(application).isSmoothVertical(false), "own smoothVertical=OFF must disable vertical smoothing")
+        XCTAssertTrue(resolved(application).isSmoothHorizontal(false), "own smoothHorizontal default ON must stay ON")
+        XCTAssertFalse(resolved(application).isReverseVertical(), "own reverseVertical=OFF must disable vertical reverse")
+        XCTAssertTrue(resolved(application).isReverseHorizontal(), "own reverseHorizontal default ON must stay ON")
     }
 
     // MARK: - 禁用平滑热键仍然优先
@@ -134,8 +139,8 @@ final class ScrollTargetApplicationRulesTests: XCTestCase {
         let application = makeApplication(inherit: false)
         application.scroll.smooth = true
 
-        XCTAssertFalse(application.isSmooth(true), "block hotkey must suppress per-app smoothing")
-        XCTAssertFalse(application.isSmoothVertical(true), "block hotkey must suppress per-app axis smoothing")
+        XCTAssertFalse(resolved(application).isSmooth(true), "block hotkey must suppress per-app smoothing")
+        XCTAssertFalse(resolved(application).isSmoothVertical(true), "block hotkey must suppress per-app axis smoothing")
     }
 
     // MARK: - 匹配链: 两种添加方式保存的路径都能命中运行中应用

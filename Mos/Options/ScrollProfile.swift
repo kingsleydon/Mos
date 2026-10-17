@@ -28,6 +28,24 @@ struct ScrollValues: Equatable {
         return OPTIONS_SCROLL_DEFAULT.generateDurationTransition(with: duration)
     }
 
+    // 生效开关: 平滑受禁用键 (block) 压制; 轴向开关受总开关约束.
+    // 覆盖层的值完全来自该层, 不再受全局开关联动 (见 #1011)
+    func isSmooth(_ block: Bool) -> Bool {
+        return smooth && !block
+    }
+    func isSmoothVertical(_ block: Bool) -> Bool {
+        return isSmooth(block) && smoothVertical
+    }
+    func isSmoothHorizontal(_ block: Bool) -> Bool {
+        return isSmooth(block) && smoothHorizontal
+    }
+    func isReverseVertical() -> Bool {
+        return reverse && reverseVertical
+    }
+    func isReverseHorizontal() -> Bool {
+        return reverse && reverseHorizontal
+    }
+
     /// 界面可见的值: 数值按显示精度 (两位小数) 取整, 去掉不可见的时长记忆
     var visible: ScrollValues {
         var values = self

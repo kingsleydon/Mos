@@ -107,11 +107,11 @@ class ScrollCore: ScrollActionPort {
             application: ScrollCore.shared.application,
             device: ScrollCore.shared.device
         )
-        var enableSmooth = resolved.smooth && !ScrollCore.shared.blockSmooth
-        var enableSmoothVertical = enableSmooth && resolved.smoothVertical
-        var enableSmoothHorizontal = enableSmooth && resolved.smoothHorizontal
-        let enableReverseVertical = resolved.reverse && resolved.reverseVertical
-        let enableReverseHorizontal = resolved.reverse && resolved.reverseHorizontal
+        var enableSmooth = resolved.isSmooth(ScrollCore.shared.blockSmooth)
+        var enableSmoothVertical = resolved.isSmoothVertical(ScrollCore.shared.blockSmooth)
+        var enableSmoothHorizontal = resolved.isSmoothHorizontal(ScrollCore.shared.blockSmooth)
+        let enableReverseVertical = resolved.isReverseVertical()
+        let enableReverseHorizontal = resolved.isReverseHorizontal()
         let step = resolved.step
         let speed = resolved.speed
         let duration = resolved.durationTransition

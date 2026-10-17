@@ -11,6 +11,13 @@ final class UpdateManager: NSObject {
 
     static let shared = UpdateManager()
 
+    /// Fork 构建 (MOS_FORK_BUILD) 不使用上游的 Sparkle 更新源: 上游更新会覆盖 fork 版本
+    #if MOS_FORK_BUILD
+    static let isEnabled = false
+    #else
+    static let isEnabled = true
+    #endif
+
     private lazy var updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
         updaterDelegate: self,
@@ -26,7 +33,7 @@ final class UpdateManager: NSObject {
 extension UpdateManager {
 
     func scheduleCheckOnAppStartIfNeeded() {
-        guard Options.shared.update.checkOnAppStart else { return }
+        guard UpdateManager.isEnabled, Options.shared.update.checkOnAppStart else { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
             self?.checkForUpdatesInBackground()
@@ -34,10 +41,12 @@ extension UpdateManager {
     }
 
     func checkForUpdates() {
+        guard UpdateManager.isEnabled else { return }
         updaterController.checkForUpdates(nil)
     }
 
     func checkForUpdatesInBackground() {
+        guard UpdateManager.isEnabled else { return }
         updaterController.updater.checkForUpdatesInBackground()
     }
 }

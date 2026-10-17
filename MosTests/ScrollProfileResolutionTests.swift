@@ -39,6 +39,11 @@ final class ScrollProfileResolutionTests: XCTestCase {
         return ScrollDevice(vendorID: 0x046d, productID: 0xb034, name: "MX Master 3S")
     }
 
+    /// 滚动路径实际使用的解析结果 (全局 → 应用)
+    private func resolved(_ application: Application) -> ScrollValues {
+        return ScrollOptionsResolver.resolve(application: application, device: nil)
+    }
+
     // MARK: - 按设定项继承
 
     func testOverriddenSettingIgnoresGlobalWhileOthersFollowIt() {
@@ -49,13 +54,13 @@ final class ScrollProfileResolutionTests: XCTestCase {
         application.scroll.reverse = false
 
         // 覆盖的设定项使用应用自身配置
-        XCTAssertFalse(application.isReverse())
+        XCTAssertFalse(resolved(application).reverse)
         // 未覆盖的设定项继续跟随全局
-        XCTAssertTrue(application.isSmooth(false))
+        XCTAssertTrue(resolved(application).isSmooth(false))
         Options.shared.scroll.smooth = false
-        XCTAssertFalse(application.isSmooth(false), "inherited setting must follow later global changes")
+        XCTAssertFalse(resolved(application).isSmooth(false), "inherited setting must follow later global changes")
         Options.shared.scroll.reverse = true
-        XCTAssertFalse(application.isReverse(), "overridden setting must not follow later global changes")
+        XCTAssertFalse(resolved(application).reverse, "overridden setting must not follow later global changes")
     }
 
     func testBeginOverridingMaterializesCurrentEffectiveValue() {
@@ -65,7 +70,7 @@ final class ScrollProfileResolutionTests: XCTestCase {
         application.beginOverriding([.step])
 
         XCTAssertEqual(application.scroll.step, 12.5, "overriding must start from the value the user was seeing")
-        XCTAssertEqual(application.getStep(), 12.5)
+        XCTAssertEqual(resolved(application).step, 12.5)
     }
 
     func testInheritRestoresGlobalValue() {
@@ -73,10 +78,10 @@ final class ScrollProfileResolutionTests: XCTestCase {
         let application = makeApplication()
         application.beginOverriding([.speed])
         application.scroll.speed = 7
-        XCTAssertEqual(application.getSpeed(), 7)
+        XCTAssertEqual(resolved(application).speed, 7)
 
         application.inherit([.speed])
-        XCTAssertEqual(application.getSpeed(), 3)
+        XCTAssertEqual(resolved(application).speed, 3)
     }
 
     func testLegacyInheritFlagMapsToAllOrNothing() {
@@ -174,7 +179,7 @@ final class ScrollProfileResolutionTests: XCTestCase {
         XCTAssertTrue(application.differingSettings().isEmpty)
         // 全局再改回开启: 覆盖重新生效
         Options.shared.scroll.reverse = true
-        XCTAssertFalse(application.isReverse())
+        XCTAssertFalse(resolved(application).reverse)
     }
 
     // MARK: - 停用与白名单

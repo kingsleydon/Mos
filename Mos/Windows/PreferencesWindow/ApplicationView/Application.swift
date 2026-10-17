@@ -104,52 +104,8 @@ extension Application {
         }
         return Utils.getApplicationName(fromPath: path)
     }
-    // 配置
-    func getStep() -> Double {
-        return resolvedScrollOptions().step
-    }
-    func getSpeed() -> Double {
-        return resolvedScrollOptions().speed
-    }
-    func getDuration() -> Double {
-        return resolvedScrollOptions().durationTransition
-    }
-    // 功能
-    // 未覆盖的设定项沿用全局配置, 结果与全局路径一致;
-    // 已覆盖的设定项完全使用应用自身配置, 不再受全局开关联动 (见 #1011)
-    func isSmooth(_ block: Bool) -> Bool {
-        if block { return false }
-        return resolvedScrollOptions().smooth
-    }
-    func isReverse() -> Bool {
-        return resolvedScrollOptions().reverse
-    }
-    func isReverseVertical() -> Bool {
-        let target = resolvedScrollOptions()
-        return target.reverse && target.reverseVertical
-    }
-    func isReverseHorizontal() -> Bool {
-        let target = resolvedScrollOptions()
-        return target.reverse && target.reverseHorizontal
-    }
-    func isSmoothVertical(_ block: Bool) -> Bool {
-        if block { return false }
-        let target = resolvedScrollOptions()
-        return target.smooth && target.smoothVertical
-    }
-    func isSmoothHorizontal(_ block: Bool) -> Bool {
-        if block { return false }
-        let target = resolvedScrollOptions()
-        return target.smooth && target.smoothHorizontal
-    }
     // 按钮绑定
     func getButtonBindings() -> [ButtonBinding] {
         return buttons?.binding ?? Options.shared.buttons.binding
-    }
-}
-
-private extension Application {
-    func resolvedScrollOptions() -> ScrollValues {
-        return effectiveValues()
     }
 }
