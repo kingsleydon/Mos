@@ -137,6 +137,19 @@ final class ScrollProfileResolutionTests: XCTestCase {
         XCTAssertEqual(makeDevice().identity, "046d:b034")
     }
 
+    func testVisibleValuesIgnoreSubDisplayDifferences() {
+        Options.shared.scroll.step = 33.6
+        let application = makeApplication()
+        application.beginOverriding([.step])
+        application.scroll.step = 33.6000001 // 滑块拖回 "33.60"
+        let effective = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [application])
+        let global = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [])
+        XCTAssertNotEqual(effective, global)
+        XCTAssertEqual(effective.visible, global.visible, "values that display the same must count as equal to global")
+        application.scroll.step = 33.7
+        XCTAssertNotEqual(ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [application]).visible, global.visible)
+    }
+
     // MARK: - 停用与白名单
 
     func testUnlistedEntriesFollowAllowlistMode() {

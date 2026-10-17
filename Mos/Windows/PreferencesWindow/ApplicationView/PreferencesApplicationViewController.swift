@@ -348,7 +348,7 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
             cell.addSubview(checkBox)
             var constraints = [checkBox.centerYAnchor.constraint(equalTo: cell.centerYAnchor)]
             if let imageView = cell.imageView {
-                constraints.append(checkBox.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: -2))
+                constraints.append(checkBox.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: -10))
             } else {
                 constraints.append(checkBox.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 2))
             }

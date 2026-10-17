@@ -27,6 +27,20 @@ struct ScrollValues: Equatable {
     var durationTransition: Double {
         return OPTIONS_SCROLL_DEFAULT.generateDurationTransition(with: duration)
     }
+
+    /// 界面可见的值: 数值按显示精度 (两位小数) 取整, 去掉不可见的时长记忆
+    var visible: ScrollValues {
+        var values = self
+        values.step = ScrollValues.displayRounded(step)
+        values.speed = ScrollValues.displayRounded(speed)
+        values.duration = ScrollValues.displayRounded(duration)
+        values.durationBeforeSimTrackpadLock = nil
+        return values
+    }
+
+    private static func displayRounded(_ value: Double) -> Double {
+        return (value * 100).rounded() / 100
+    }
 }
 
 /// 可单独继承/覆盖的滚动设定项, 与偏好面板中的行一一对应

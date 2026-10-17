@@ -12,8 +12,12 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
 
     // Target application / device
     // - Using when the VC is inside the Application / Device Setting Popup
-    var currentTargetApplication: Application?
-    var currentTargetDevice: ScrollDevice?
+    var currentTargetApplication: Application? {
+        didSet { targetDidChange() }
+    }
+    var currentTargetDevice: ScrollDevice? {
+        didSet { targetDidChange() }
+    }
     // 设定变更回调 (供外层容器同步继承状态)
     var onOptionsChanged: (() -> Void)?
     // UI Elements: 行标题
@@ -69,14 +73,10 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         resetButtonHeightConstraint = resetToDefaultsButton.heightAnchor.constraint(equalToConstant: 24)
         resetButtonHeightConstraint?.isActive = true
         scrollDurationDescriptionDefaultText = scrollDurationDescriptionLabel?.stringValue
-        // 覆盖层上下文: 重置为全局设定
-        if currentScrollProfile != nil {
-            resetToDefaultsButton.title = NSLocalizedString("resetToGlobalSettings", comment: "Button that removes every override of an app or device so it follows the global settings")
-        }
         // 设置 KeyRecorder 代理
         keyRecorder.delegate = self
-        // 覆盖层上下文: 按设定项继承
-        setupInheritButtons()
+        // 覆盖层上下文: 按设定项继承, 重置为全局设定
+        setupProfileControls()
         // 读取设置
         syncViewWithOptions()
     }
@@ -405,9 +405,22 @@ extension PreferencesScrollingViewController {
         ]
     }
 
+    /// 目标可能在视图加载后才设置 (容器的 embed segue), 此时补做覆盖层初始化
+    private func targetDidChange() {
+        guard isViewLoaded else { return }
+        setupProfileControls()
+        syncViewWithOptions()
+    }
+
+    private func setupProfileControls() {
+        guard currentScrollProfile != nil else { return }
+        resetToDefaultsButton.title = NSLocalizedString("resetToGlobalSettings", comment: "Button that removes every override of an app or device so it follows the global settings")
+        setupInheritButtons()
+    }
+
     /// 覆盖层上下文中, 在每行标题文字左侧放置 "恢复为全局设定" 按钮 (仅已覆盖时可见)
     private func setupInheritButtons() {
-        guard currentScrollProfile != nil else { return }
+        guard inheritButtons.isEmpty else { return }
         for (setting, label) in settingLabels {
             guard let label = label, let index = ScrollSetting.allCases.firstIndex(of: setting) else { continue }
             let button = NSButton(title: "", target: self, action: #selector(inheritSettingClick(_:)))
@@ -474,14 +487,11 @@ extension PreferencesScrollingViewController {
         return Options.shared.scroll.values != DefaultConfigForCompare.values
     }
 
-    /// 覆盖层的生效值是否与全局配置不同 (仅比较界面可见的值)
+    /// 覆盖层的生效值是否与全局配置不同 (按界面显示精度比较)
     private func differsFromGlobal() -> Bool {
         guard let profile = currentScrollProfile else { return false }
-        var effective = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [profile])
-        var global = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [])
-        // 模拟触控板前的时长记忆不可见, 不参与比较
-        effective.durationBeforeSimTrackpadLock = nil
-        global.durationBeforeSimTrackpadLock = nil
-        return effective != global
+        let effective = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [profile])
+        let global = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [])
+        return effective.visible != global.visible
     }
 }
