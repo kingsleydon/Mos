@@ -335,12 +335,13 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
     }
     // 构建表格数据 (循环生成行)
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        // 启用开关列没有 Storyboard 原型, 需在 makeView 之前单独处理
+        if tableColumn?.identifier.rawValue == CellIdentifiers.enabledCell {
+            return enabledCell(row: row)
+        }
         guard let tableColumnIdentifier = tableColumn?.identifier,
               let cell = tableView.makeView(withIdentifier: tableColumnIdentifier, owner: self) as? NSTableCellView else {
             return nil
-        }
-        if tableColumnIdentifier.rawValue == CellIdentifiers.enabledCell {
-            return enabledCell(row: row)
         }
         // 生成每行的 Cell
         switch tableColumnIdentifier.rawValue {

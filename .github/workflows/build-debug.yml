@@ -50,6 +50,8 @@ jobs:
             test \
             -only-testing:MosTests/ScrollProfileResolutionTests \
             -only-testing:MosTests/InputBypassTests \
+            -only-testing:MosTests/OverridesListTests \
+            -only-testing:MosTests/UISnapshotTests \
             -only-testing:MosTests/InputProcessorTests \
             -only-testing:MosTests/ScrollCoreHotkeyTests \
             -only-testing:MosTests/OptionsChangePropagationTests \
@@ -57,3 +59,12 @@ jobs:
             -only-testing:MosTests/ScrollPosterConfigSnapshotTests \
             -only-testing:MosTests/LogiUsageBootstrapTests \
             -only-testing:MosTests/UsageRegistryEndToEndTests
+
+      - name: Upload UI snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mos-UI-Snapshots
+          path: /tmp/MosSnapshots
+          retention-days: 14
+          if-no-files-found: warn
