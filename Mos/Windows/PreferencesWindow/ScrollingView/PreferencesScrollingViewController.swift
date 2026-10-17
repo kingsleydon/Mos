@@ -69,6 +69,10 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         resetButtonHeightConstraint = resetToDefaultsButton.heightAnchor.constraint(equalToConstant: 24)
         resetButtonHeightConstraint?.isActive = true
         scrollDurationDescriptionDefaultText = scrollDurationDescriptionLabel?.stringValue
+        // 覆盖层上下文: 重置为全局设定
+        if currentScrollProfile != nil {
+            resetToDefaultsButton.title = NSLocalizedString("resetToGlobalSettings", comment: "Button that removes every override of an app or device so it follows the global settings")
+        }
         // 设置 KeyRecorder 代理
         keyRecorder.delegate = self
         // 覆盖层上下文: 按设定项继承
@@ -187,9 +191,9 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     
     // 重置
     @IBAction func resetToDefaultClick(_ sender: NSButton) {
+        // 覆盖层上下文: 恢复为全局设定 (取消全部覆盖)
         if let profile = currentScrollProfile {
-            profile.scroll = OPTIONS_SCROLL_DEFAULT()
-            profile.overrides = profile.supportedSettings
+            profile.inherit(profile.supportedSettings)
         } else {
             Options.shared.scroll = OPTIONS_SCROLL_DEFAULT()
         }
@@ -268,7 +272,7 @@ extension PreferencesScrollingViewController {
     }
     // 更新重置按钮状态与显示
     func updateResetButtonState() {
-        let shouldShowResetButton = differsFromDefaults()
+        let shouldShowResetButton = currentScrollProfile == nil ? differsFromDefaults() : differsFromGlobal()
         // 动画过渡
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = ANIMATION.duration
@@ -467,13 +471,17 @@ extension PreferencesScrollingViewController {
 
     /// 是否与默认配置不同 (覆盖层上下文只比较可覆盖的设定项)
     private func differsFromDefaults() -> Bool {
-        let current = getTargetApplicationScrollOptions().values
-        let defaults = DefaultConfigForCompare.values
-        guard let profile = currentScrollProfile else { return current != defaults }
-        var comparable = defaults
-        for setting in profile.supportedSettings {
-            setting.merge(from: current, into: &comparable)
-        }
-        return comparable != defaults
+        return Options.shared.scroll.values != DefaultConfigForCompare.values
+    }
+
+    /// 覆盖层的生效值是否与全局配置不同 (仅比较界面可见的值)
+    private func differsFromGlobal() -> Bool {
+        guard let profile = currentScrollProfile else { return false }
+        var effective = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [profile])
+        var global = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [])
+        // 模拟触控板前的时长记忆不可见, 不参与比较
+        effective.durationBeforeSimTrackpadLock = nil
+        global.durationBeforeSimTrackpadLock = nil
+        return effective != global
     }
 }
