@@ -278,7 +278,8 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         let applicationColumn = tableView.column(withIdentifier: NSUserInterfaceItemIdentifier(CellIdentifiers.applicationCell))
         guard applicationColumn >= 0 else { return }
         let iconX: CGFloat
-        if let imageView = (tableView.view(atColumn: applicationColumn, row: 0, makeIfNecessary: false) as? NSTableCellView)?.imageView {
+        if tableView.numberOfRows > 0,
+           let imageView = (tableView.view(atColumn: applicationColumn, row: 0, makeIfNecessary: false) as? NSTableCellView)?.imageView {
             iconX = imageView.convert(imageView.bounds, to: container).minX
         } else {
             // 尚无行视图: 按列位置 + 单元格内图标边距 (Storyboard 中为 20) 估算
