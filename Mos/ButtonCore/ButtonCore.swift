@@ -48,6 +48,12 @@ class ButtonCore {
             return Unmanaged.passUnretained(event)
         }
 
+        // 停用 / 白名单: 不触发新的绑定. 抬起事件仍交给 InputProcessor, 它只释放已按下的绑定, 避免卡键
+        if type == .otherMouseDown || type == .keyDown,
+           InputBypass.shared.shouldBypass(event, isPointingEvent: type == .otherMouseDown) {
+            return Unmanaged.passUnretained(event)
+        }
+
         // 使用原始 flags 匹配绑定 (不注入虚拟修饰键, 保证匹配准确)
         let mosEvent = InputEvent(fromCGEvent: event)
         let result = InputProcessor.shared.process(mosEvent)

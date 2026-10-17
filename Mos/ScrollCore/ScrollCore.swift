@@ -71,6 +71,22 @@ class ScrollCore: ScrollActionPort {
         }
         // 滚动事件
         let scrollEvent = ScrollEvent(with: event)
+        // 触控板不参与停用 / 白名单判断 (下方同样直接放行)
+        let isTrackpad = scrollEvent.isTrackpad()
+        // 获取事件目标
+        let targetRunningApplication = ScrollUtils.shared.getRunningApplication(from: event)
+        // 获取列表中应用程序与设备的例外设置信息
+        ScrollCore.shared.application = ScrollUtils.shared.getTargetApplication(from: targetRunningApplication)
+        ScrollCore.shared.device = isTrackpad ? nil : ScrollUtils.shared.getTargetDevice(from: event)
+        // 已停用的应用/设备, 以及白名单模式下未列出的应用/设备: 完全不处理
+        if !isTrackpad && !ScrollOptionsResolver.isActive(
+            application: ScrollCore.shared.application,
+            device: ScrollCore.shared.device,
+            applicationAllowlist: Options.shared.application.allowlist,
+            deviceAllowlist: Options.shared.device.allowlist
+        ) {
+            return Unmanaged.passUnretained(event)
+        }
         let hasVerticalDelta = scrollEvent.Y.valid && scrollEvent.Y.usableValue != 0.0
         let hasHorizontalDelta = scrollEvent.X.valid && scrollEvent.X.usableValue != 0.0
         if hasVerticalDelta || hasHorizontalDelta {
@@ -81,7 +97,7 @@ class ScrollCore: ScrollActionPort {
         // 不处理触控板
         // 无法区分黑苹果, 因为黑苹果的触控板驱动直接模拟鼠标输入
         // 无法区分 Magic Mouse, 因为其滚动特征与内置的 Trackpad 一致
-        if scrollEvent.isTrackpad() {
+        if isTrackpad {
             return Unmanaged.passUnretained(event)
         }
         // 当事件来自远程桌面，且其发送的事件 isContinuous=1.0，此时跳过本地平滑
@@ -89,43 +105,19 @@ class ScrollCore: ScrollActionPort {
             return Unmanaged.passUnretained(event)
         }
         // 当鼠标输入, 根据需要执行翻转方向/平滑滚动
-        // 获取事件目标
-        let targetRunningApplication = ScrollUtils.shared.getRunningApplication(from: event)
-        // 获取列表中应用程序的列外设置信息
-        ScrollCore.shared.application = ScrollUtils.shared.getTargetApplication(from: targetRunningApplication)
-        // 获取列表中设备的例外设置信息
-        ScrollCore.shared.device = ScrollUtils.shared.getTargetDevice(from: event)
-        // 平滑/翻转
-        var enableSmooth = false,
-            enableSmoothVertical = false,
-            enableSmoothHorizontal = false,
-            enableReverseVertical = false,
-            enableReverseHorizontal = false
-        var step = Options.shared.scroll.step,
-            speed = Options.shared.scroll.speed,
-            duration = Options.shared.scroll.durationTransition
-        // 已停用的应用/设备, 以及白名单模式下未列出的应用/设备不做处理
-        let isActive = ScrollOptionsResolver.isActive(
+        // 平滑/翻转: 按设定项合并 全局 → 例外应用 → 例外设备
+        let resolved = ScrollOptionsResolver.resolve(
             application: ScrollCore.shared.application,
-            device: ScrollCore.shared.device,
-            applicationAllowlist: Options.shared.application.allowlist,
-            deviceAllowlist: Options.shared.device.allowlist
+            device: ScrollCore.shared.device
         )
-        if isActive {
-            // 按设定项合并: 全局 → 例外应用 → 例外设备
-            let resolved = ScrollOptionsResolver.resolve(
-                application: ScrollCore.shared.application,
-                device: ScrollCore.shared.device
-            )
-            enableSmooth = resolved.smooth && !ScrollCore.shared.blockSmooth
-            enableSmoothVertical = enableSmooth && resolved.smoothVertical
-            enableSmoothHorizontal = enableSmooth && resolved.smoothHorizontal
-            enableReverseVertical = resolved.reverse && resolved.reverseVertical
-            enableReverseHorizontal = resolved.reverse && resolved.reverseHorizontal
-            step = resolved.step
-            speed = resolved.speed
-            duration = resolved.durationTransition
-        }
+        var enableSmooth = resolved.smooth && !ScrollCore.shared.blockSmooth
+        var enableSmoothVertical = enableSmooth && resolved.smoothVertical
+        var enableSmoothHorizontal = enableSmooth && resolved.smoothHorizontal
+        let enableReverseVertical = resolved.reverse && resolved.reverseVertical
+        let enableReverseHorizontal = resolved.reverse && resolved.reverseHorizontal
+        let step = resolved.step
+        let speed = resolved.speed
+        let duration = resolved.durationTransition
         // Launchpad 激活则强制屏蔽平滑
         if ScrollUtils.shared.getLaunchpadActivity(withRunningApplication: targetRunningApplication) {
             enableSmooth = false
@@ -318,6 +310,12 @@ class ScrollCore: ScrollActionPort {
             return nil
         }
 
+        // 停用 / 白名单: 忽略按下 (抬起与修饰键变化仍需处理, 避免焦点切换后状态卡住)
+        if type == .keyDown || type == .otherMouseDown,
+           InputBypass.shared.shouldBypass(event, isPointingEvent: type == .otherMouseDown) {
+            return nil
+        }
+
         let keyCode = event.keyCode
         let mouseButton = UInt16(event.getIntegerValueField(.mouseEventButtonNumber))
 
@@ -399,6 +397,10 @@ class ScrollCore: ScrollActionPort {
     
     // MARK: - 鼠标事件处理
     let mouseLeftEventCallBack: CGEventTapCallBack = { (proxy, type, event, refcon) in
+        // 停用 / 白名单下的点击不影响滚动
+        if InputBypass.shared.shouldBypass(event, isPointingEvent: true) {
+            return nil
+        }
         // 如果点击左键则停止滚动
         ScrollPoster.shared.stop()
         return nil

@@ -49,6 +49,9 @@ jobs:
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             test \
             -only-testing:MosTests/ScrollProfileResolutionTests \
+            -only-testing:MosTests/InputBypassTests \
+            -only-testing:MosTests/InputProcessorTests \
+            -only-testing:MosTests/ScrollCoreHotkeyTests \
             -only-testing:MosTests/OptionsChangePropagationTests \
             -only-testing:MosTests/ScrollTargetApplicationRulesTests \
             -only-testing:MosTests/ScrollPosterConfigSnapshotTests \
