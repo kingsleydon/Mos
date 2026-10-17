@@ -1,11 +1,11 @@
 name: Release Fork Build
 
-# 推送 v*-fork.* 标签触发: 构建 Release 配置的 Mos.app (ad-hoc 签名, 不公证, 不含 Sparkle 更新源),
+# 推送 v*-kingsley.* 标签触发: 构建 Release 配置的 Mos.app (ad-hoc 签名, 不公证, 不含 Sparkle 更新源),
 # 并创建 GitHub 草稿 Release. 发布草稿由人工在 GitHub 上完成.
 on:
   push:
     tags:
-      - "v*-fork.*"
+      - "v*-kingsley.*"
 
 env:
   VERSION: ${{ github.ref_name }}

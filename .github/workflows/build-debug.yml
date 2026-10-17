@@ -42,23 +42,13 @@ jobs:
           path: build/Mos-Debug.zip
           retention-days: 14
 
-      - name: Test scroll profile logic
+      # 完整 MosTests (Debug 测试计划; 真实设备测试在单独的计划中, 不在此运行)
+      - name: Test
         run: |
           xcodebuild -scheme Debug -destination 'platform=macOS' \
             -derivedDataPath build/DerivedData \
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
-            test \
-            -only-testing:MosTests/ScrollProfileResolutionTests \
-            -only-testing:MosTests/InputBypassTests \
-            -only-testing:MosTests/OverridesListTests \
-            -only-testing:MosTests/UISnapshotTests \
-            -only-testing:MosTests/InputProcessorTests \
-            -only-testing:MosTests/ScrollCoreHotkeyTests \
-            -only-testing:MosTests/OptionsChangePropagationTests \
-            -only-testing:MosTests/ScrollTargetApplicationRulesTests \
-            -only-testing:MosTests/ScrollPosterConfigSnapshotTests \
-            -only-testing:MosTests/LogiUsageBootstrapTests \
-            -only-testing:MosTests/UsageRegistryEndToEndTests
+            test
 
       - name: Upload UI snapshots
         if: always()

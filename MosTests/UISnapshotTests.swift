@@ -116,11 +116,21 @@ final class UISnapshotTests: XCTestCase {
         NSApp.sendAction(action, to: segmented.target, from: segmented)
     }
 
+    /// 深色与浅色外观各渲染一张
     private func snapshot(_ controller: NSViewController, name: String) {
-        let window = NSWindow(contentViewController: controller)
         if #available(macOS 10.14, *) {
-            window.appearance = NSAppearance(named: .darkAqua)
+            render(controller, name: "\(name)-dark", appearance: NSAppearance(named: .darkAqua))
+            render(controller, name: "\(name)-light", appearance: NSAppearance(named: .aqua))
+        } else {
+            render(controller, name: name, appearance: nil)
         }
+    }
+
+    private func render(_ controller: NSViewController, name: String, appearance: NSAppearance?) {
+        // 同一控制器复用时先移出上一个窗口
+        windows.last?.contentViewController = nil
+        let window = NSWindow(contentViewController: controller)
+        window.appearance = appearance
         window.setFrameOrigin(NSPoint(x: -10000, y: -10000))
         window.orderFrontRegardless()
         windows.append(window)
