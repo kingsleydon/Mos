@@ -202,6 +202,20 @@ final class ScrollProfileResolutionTests: XCTestCase {
         XCTAssertEqual(object?["inherit"] as? Bool, false)
     }
 
+    func testLegacyReaderSeesEffectiveValues() throws {
+        // 旧版 Mos 读取: inherit=false 时整组使用 scroll
+        Options.shared.scroll.speed = 7
+        let application = makeApplication()
+        application.beginOverriding([.reverse])
+        application.scroll.reverse = false
+        application.scroll.speed = 2.7 // 未覆盖字段中的过期本地值
+        let object = try JSONSerialization.jsonObject(with: JSONEncoder().encode(application)) as? [String: Any]
+        let scroll = object?["scroll"] as? [String: Any]
+        XCTAssertEqual(object?["inherit"] as? Bool, false)
+        XCTAssertEqual(scroll?["speed"] as? Double, 7, "inherited settings must be written as the current global value")
+        XCTAssertEqual(scroll?["reverse"] as? Bool, false)
+    }
+
     func testDeviceRoundTrip() throws {
         let device = makeDevice()
         device.beginOverriding([.reverse])

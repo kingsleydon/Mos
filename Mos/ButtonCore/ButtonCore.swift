@@ -19,6 +19,8 @@ class ButtonCore {
     
     // 拦截层
     var dispatchInterceptor: Interceptor?
+    // 停用 / 白名单下被忽略的按键
+    let bypassedPresses = BypassedPressTracker()
     // 组合的按钮事件掩码
     let otherDown = CGEventMask(1 << CGEventType.otherMouseDown.rawValue)
     let keyDown = CGEventMask(1 << CGEventType.keyDown.rawValue)
@@ -41,6 +43,7 @@ class ButtonCore {
         // Tap 被系统禁用时, 清理活跃绑定状态并直接放行
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             InputProcessor.shared.clearActiveBindings()
+            ButtonCore.shared.bypassedPresses.reset()
             return Unmanaged.passUnretained(event)
         }
         // 跳过 Mos 合成事件, 避免 executeCustom 发出的事件被重复处理
@@ -48,9 +51,10 @@ class ButtonCore {
             return Unmanaged.passUnretained(event)
         }
 
-        // 停用 / 白名单: 不触发新的绑定. 抬起事件仍交给 InputProcessor, 它只释放已按下的绑定, 避免卡键
-        if type == .otherMouseDown || type == .keyDown,
-           InputBypass.shared.shouldBypass(event, isPointingEvent: type == .otherMouseDown) {
+        // 停用 / 白名单: 忽略整个按键过程 (按下, 重复, 抬起), 不影响其他设备/应用中已按下的绑定
+        let isDown = type == .otherMouseDown || type == .keyDown
+        let bypassedPresses = ButtonCore.shared.bypassedPresses
+        if isDown ? bypassedPresses.shouldBypassDown(event, type: type) : bypassedPresses.shouldBypassUp(event, type: type) {
             return Unmanaged.passUnretained(event)
         }
 
@@ -89,6 +93,7 @@ class ButtonCore {
                 )
                 dispatchInterceptor?.onRestart = {
                     InputProcessor.shared.clearActiveBindings()
+                    ButtonCore.shared.bypassedPresses.reset()
                 }
                 isActive = true
             } catch {

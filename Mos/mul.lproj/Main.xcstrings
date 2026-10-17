@@ -2321,20 +2321,20 @@
       "localizations" : {
         "cs" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "Přepsání"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "Überschreibungen"
           }
         },
         "el" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "Παρακάμψεις"
           }
         },
         "en" : {
@@ -2345,8 +2345,8 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "Remplacements"
           }
         },
         "ja" : {
@@ -2357,32 +2357,32 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "개별 설정"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "Переопределения"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "การกำหนดแยก"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "Geçersiz Kılmalar"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Overrides"
+            "state" : "translated",
+            "value" : "Перевизначення"
           }
         },
         "zh-Hans" : {

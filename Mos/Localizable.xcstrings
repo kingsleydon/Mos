@@ -14141,20 +14141,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "Není připojena žádná myš"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "Keine Maus verbunden"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "Δεν υπάρχει συνδεδεμένο ποντίκι"
           }
         },
         "en": {
@@ -14165,8 +14165,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "Aucune souris connectée"
           }
         },
         "ja": {
@@ -14177,32 +14177,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "연결된 마우스 없음"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "Мышь не подключена"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "ไม่มีเมาส์ที่เชื่อมต่อ"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "Bağlı fare yok"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Mouse Connected"
+            "state": "translated",
+            "value": "Мишу не під’єднано"
           }
         },
         "zh-Hans": {
@@ -14236,20 +14236,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "Použít globální nastavení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "Globale Einstellung verwenden"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "Χρήση γενικής ρύθμισης"
           }
         },
         "en": {
@@ -14260,8 +14260,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "Utiliser le réglage global"
           }
         },
         "ja": {
@@ -14272,32 +14272,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "전역 설정 사용"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "Использовать глобальную настройку"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "ใช้การตั้งค่าส่วนกลาง"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "Evrensel ayarı kullan"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Global Setting"
+            "state": "translated",
+            "value": "Використовувати глобальне налаштування"
           }
         },
         "zh-Hans": {
@@ -14331,20 +14331,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "Řídí se globálním nastavením. Změnou jej přepíšete."
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "Folgt der globalen Einstellung. Ändern, um sie zu überschreiben."
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "Ακολουθεί τη γενική ρύθμιση. Αλλάξτε τη για παράκαμψη."
           }
         },
         "en": {
@@ -14355,8 +14355,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "Suit le réglage global. Modifiez-le pour le remplacer."
           }
         },
         "ja": {
@@ -14367,32 +14367,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "전역 설정을 따릅니다. 변경하면 개별 설정됩니다."
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "Следует глобальной настройке. Измените, чтобы переопределить."
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "ใช้ตามการตั้งค่าส่วนกลาง เปลี่ยนค่าเพื่อกำหนดแยก"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "Evrensel ayarı izler. Geçersiz kılmak için değiştirin."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follows the global setting. Change it to override."
+            "state": "translated",
+            "value": "Відповідає глобальному налаштуванню. Змініть, щоб перевизначити."
           }
         },
         "zh-Hans": {
@@ -14426,20 +14426,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "Toto nastavení nelze nastavit pro jednotlivá zařízení."
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "Diese Einstellung kann nicht pro Gerät festgelegt werden."
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "Αυτή η ρύθμιση δεν ορίζεται ανά συσκευή."
           }
         },
         "en": {
@@ -14450,8 +14450,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "Ce réglage ne peut pas être défini par appareil."
           }
         },
         "ja": {
@@ -14462,32 +14462,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "이 설정은 기기별로 지정할 수 없습니다."
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "Эту настройку нельзя задать для отдельного устройства."
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "ไม่สามารถตั้งค่านี้แยกตามอุปกรณ์ได้"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "Bu ayar cihaz bazında yapılamaz."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This setting can't be set per device."
+            "state": "translated",
+            "value": "Це налаштування не можна задати для окремого пристрою."
           }
         },
         "zh-Hans": {
@@ -14521,20 +14521,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "Aplikace"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "Apps"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "Εφαρμογές"
           }
         },
         "en": {
@@ -14545,7 +14545,7 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Applications"
           }
         },
@@ -14557,32 +14557,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "앱"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "Приложения"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "แอป"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "Uygulamalar"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applications"
+            "state": "translated",
+            "value": "Програми"
           }
         },
         "zh-Hans": {
@@ -14616,20 +14616,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "Zařízení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "Geräte"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "Συσκευές"
           }
         },
         "en": {
@@ -14640,8 +14640,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "Appareils"
           }
         },
         "ja": {
@@ -14652,32 +14652,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "기기"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "Устройства"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "อุปกรณ์"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "Cihazlar"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Devices"
+            "state": "translated",
+            "value": "Пристрої"
           }
         },
         "zh-Hans": {
@@ -14711,20 +14711,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "Zařízení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "Gerät"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "Συσκευή"
           }
         },
         "en": {
@@ -14735,8 +14735,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "Appareil"
           }
         },
         "ja": {
@@ -14747,32 +14747,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "기기"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "Устройство"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "อุปกรณ์"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "Cihaz"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Device"
+            "state": "translated",
+            "value": "Пристрій"
           }
         },
         "zh-Hans": {
@@ -14806,20 +14806,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "Žádná nastavení zařízení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "Keine Geräteeinstellungen"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "Καμία ρύθμιση συσκευής"
           }
         },
         "en": {
@@ -14830,8 +14830,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "Aucun réglage d’appareil"
           }
         },
         "ja": {
@@ -14842,32 +14842,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "기기별 설정 없음"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "Нет настроек устройств"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "ไม่มีการตั้งค่าเฉพาะอุปกรณ์"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "Cihaz ayarı yok"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "No Device Overrides"
+            "state": "translated",
+            "value": "Немає налаштувань пристроїв"
           }
         },
         "zh-Hans": {
@@ -14901,20 +14901,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "Přizpůsobte posouvání pro konkrétní myš"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "Scrollen für eine bestimmte Maus anpassen"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "Προσαρμόστε την κύλιση για συγκεκριμένο ποντίκι"
           }
         },
         "en": {
@@ -14925,8 +14925,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "Personnalisez le défilement d’une souris précise"
           }
         },
         "ja": {
@@ -14937,32 +14937,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "특정 마우스의 스크롤을 사용자화"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "Настройте прокрутку для конкретной мыши"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "ปรับแต่งการเลื่อนสำหรับเมาส์เฉพาะตัว"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "Belirli bir fare için kaydırmayı özelleştirin"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Customize scrolling for a specific mouse"
+            "state": "translated",
+            "value": "Налаштуйте прокручування для певної миші"
           }
         },
         "zh-Hans": {
@@ -14996,20 +14996,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "Přidat zařízení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "Gerät hinzufügen"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "Προσθήκη συσκευής"
           }
         },
         "en": {
@@ -15020,8 +15020,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "Ajouter un appareil"
           }
         },
         "ja": {
@@ -15032,32 +15032,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "기기 추가"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "Добавить устройство"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "เพิ่มอุปกรณ์"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "Cihaz Ekle"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Device"
+            "state": "translated",
+            "value": "Додати пристрій"
           }
         },
         "zh-Hans": {
@@ -15091,20 +15091,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "Vyberte připojenou myš k nastavení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "Verbundene Maus zum Konfigurieren auswählen"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "Επιλέξτε ένα συνδεδεμένο ποντίκι για ρύθμιση"
           }
         },
         "en": {
@@ -15115,8 +15115,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "Choisissez une souris connectée à configurer"
           }
         },
         "ja": {
@@ -15127,32 +15127,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "설정할 연결된 마우스를 선택"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "Выберите подключённую мышь для настройки"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "เลือกเมาส์ที่เชื่อมต่ออยู่เพื่อตั้งค่า"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "Yapılandırmak için bağlı bir fare seçin"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pick a connected mouse to configure"
+            "state": "translated",
+            "value": "Виберіть під’єднану мишу для налаштування"
           }
         },
         "zh-Hans": {
@@ -15186,20 +15186,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "Vše převzato"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "Alles vererbt"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "Όλα κληρονομούνται"
           }
         },
         "en": {
@@ -15210,8 +15210,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "Tout hérité"
           }
         },
         "ja": {
@@ -15222,32 +15222,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "모두 따라감"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "Всё унаследовано"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "ใช้ค่าส่วนกลางทั้งหมด"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "Tümü devralınır"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Inherits all"
+            "state": "translated",
+            "value": "Усе успадковано"
           }
         },
         "zh-Hans": {
@@ -15281,20 +15281,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "Vše přepsáno"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "Alles überschrieben"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "Όλα παρακάμπτονται"
           }
         },
         "en": {
@@ -15305,8 +15305,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "Tout remplacé"
           }
         },
         "ja": {
@@ -15317,32 +15317,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "모두 개별 설정"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "Всё переопределено"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "กำหนดแยกทั้งหมด"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "Tümü geçersiz kılınır"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Overrides all"
+            "state": "translated",
+            "value": "Усе перевизначено"
           }
         },
         "zh-Hans": {
@@ -15376,19 +15376,19 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
@@ -15400,7 +15400,7 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
@@ -15412,31 +15412,31 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ", "
           }
         },
@@ -15471,20 +15471,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "Plynulost"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "Sanft"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "Ομαλότητα"
           }
         },
         "en": {
@@ -15495,8 +15495,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "Fluidité"
           }
         },
         "ja": {
@@ -15507,32 +15507,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "부드러움"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "Плавность"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "ความราบรื่น"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "Yumuşaklık"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Smooth"
+            "state": "translated",
+            "value": "Плавність"
           }
         },
         "zh-Hans": {
@@ -15566,20 +15566,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "Obrácení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "Umkehren"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "Αντιστροφή"
           }
         },
         "en": {
@@ -15590,8 +15590,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "Inversion"
           }
         },
         "ja": {
@@ -15602,32 +15602,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "방향 전환"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "Реверс"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "กลับทิศ"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "Ters Çevirme"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reverse"
+            "state": "translated",
+            "value": "Реверс"
           }
         },
         "zh-Hans": {
@@ -15661,20 +15661,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "Klávesa zrychlení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "Beschleunigungstaste"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "Πλήκτρο επιτάχυνσης"
           }
         },
         "en": {
@@ -15685,8 +15685,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "Touche d’accélération"
           }
         },
         "ja": {
@@ -15697,32 +15697,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "대시 키"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "Кнопка ускорения"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "ปุ่มเร่งความเร็ว"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "Hızlanma Tuşu"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Dash Key"
+            "state": "translated",
+            "value": "Клавіша прискорення"
           }
         },
         "zh-Hans": {
@@ -15756,20 +15756,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "Klávesa přepnutí"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "Umschalttaste"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "Πλήκτρο εναλλαγής"
           }
         },
         "en": {
@@ -15780,8 +15780,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "Touche de bascule"
           }
         },
         "ja": {
@@ -15792,32 +15792,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "토글 키"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "Кнопка смены направления"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "ปุ่มสลับ"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "Geçiş Tuşu"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Toggle Key"
+            "state": "translated",
+            "value": "Клавіша перемикання"
           }
         },
         "zh-Hans": {
@@ -15851,20 +15851,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "Klávesa blokování"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "Sperrtaste"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "Πλήκτρο αποκλεισμού"
           }
         },
         "en": {
@@ -15875,8 +15875,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "Touche de blocage"
           }
         },
         "ja": {
@@ -15887,32 +15887,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "차단 키"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "Кнопка блокировки"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "ปุ่มบล็อก"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "Bloklama Tuşu"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Block Key"
+            "state": "translated",
+            "value": "Клавіша блокування"
           }
         },
         "zh-Hans": {
@@ -15946,20 +15946,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "Krok"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "Schritt"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "Βήμα"
           }
         },
         "en": {
@@ -15970,8 +15970,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "Étape"
           }
         },
         "ja": {
@@ -15982,32 +15982,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "스텝"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "Шаг"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "ขั้น"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "Adım"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Step"
+            "state": "translated",
+            "value": "Крок"
           }
         },
         "zh-Hans": {
@@ -16041,20 +16041,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "Rychlost"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "Geschwindigkeit"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "Ταχύτητα"
           }
         },
         "en": {
@@ -16065,8 +16065,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "Vitesse"
           }
         },
         "ja": {
@@ -16077,32 +16077,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "속도"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "Скорость"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "ความเร็ว"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "Hız"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speed"
+            "state": "translated",
+            "value": "Швидкість"
           }
         },
         "zh-Hans": {
@@ -16136,20 +16136,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "Trvání"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "Dauer"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "Διάρκεια"
           }
         },
         "en": {
@@ -16160,8 +16160,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "Durée"
           }
         },
         "ja": {
@@ -16172,32 +16172,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "지속 시간"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "Продолжительность"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "ระยะเวลา"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "Süre"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Duration"
+            "state": "translated",
+            "value": "Тривалість"
           }
         },
         "zh-Hans": {
@@ -16231,20 +16231,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos vypnut"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos aus"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos ανενεργό"
           }
         },
         "en": {
@@ -16255,8 +16255,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos désactivé"
           }
         },
         "ja": {
@@ -16267,32 +16267,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos 꺼짐"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos выключен"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "ปิด Mos"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos kapalı"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Mos off"
+            "state": "translated",
+            "value": "Mos вимкнено"
           }
         },
         "zh-Hans": {
@@ -16326,20 +16326,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "Používat Mos v této aplikaci"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "Mos in dieser App verwenden"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "Χρήση του Mos σε αυτή την εφαρμογή"
           }
         },
         "en": {
@@ -16350,8 +16350,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "Utiliser Mos dans cette app"
           }
         },
         "ja": {
@@ -16362,32 +16362,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "이 앱에서 Mos 사용"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "Использовать Mos в этом приложении"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "ใช้ Mos ในแอปนี้"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "Bu uygulamada Mos’u kullan"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos in this app"
+            "state": "translated",
+            "value": "Використовувати Mos у цій програмі"
           }
         },
         "zh-Hans": {
@@ -16421,20 +16421,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "Používat Mos s touto myší"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "Mos mit dieser Maus verwenden"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "Χρήση του Mos με αυτό το ποντίκι"
           }
         },
         "en": {
@@ -16445,8 +16445,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "Utiliser Mos avec cette souris"
           }
         },
         "ja": {
@@ -16457,32 +16457,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "이 마우스에서 Mos 사용"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "Использовать Mos с этой мышью"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "ใช้ Mos กับเมาส์นี้"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "Bu farede Mos’u kullan"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use Mos with this mouse"
+            "state": "translated",
+            "value": "Використовувати Mos з цією мишею"
           }
         },
         "zh-Hans": {
@@ -16516,20 +16516,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "Používat Mos jen se zaškrtnutými myšmi v tomto seznamu"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "Mos nur mit den markierten Mäusen in dieser Liste verwenden"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "Χρήση του Mos μόνο με τα επιλεγμένα ποντίκια της λίστας"
           }
         },
         "en": {
@@ -16540,8 +16540,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "Utiliser Mos uniquement avec les souris cochées dans cette liste"
           }
         },
         "ja": {
@@ -16552,32 +16552,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "이 목록에서 선택된 마우스에서만 Mos 사용"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "Использовать Mos только с отмеченными мышами из списка"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "ใช้ Mos กับเมาส์ที่เลือกไว้ในรายการนี้เท่านั้น"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "Mos’u yalnızca bu listede işaretli farelerle kullan"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Only use Mos with the checked mice in this list"
+            "state": "translated",
+            "value": "Використовувати Mos лише з позначеними мишами в цьому списку"
           }
         },
         "zh-Hans": {
@@ -16611,20 +16611,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "Obnovit globální nastavení"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "Auf globale Einstellungen zurücksetzen"
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "Επαναφορά στις γενικές ρυθμίσεις"
           }
         },
         "en": {
@@ -16635,8 +16635,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "Rétablir les réglages globaux"
           }
         },
         "ja": {
@@ -16647,32 +16647,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "전역 설정으로 재설정"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "Сбросить к глобальным настройкам"
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "รีเซ็ตเป็นการตั้งค่าส่วนกลาง"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "Evrensel Ayarlara Sıfırla"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Reset to Global Settings"
+            "state": "translated",
+            "value": "Скинути до глобальних налаштувань"
           }
         },
         "zh-Hans": {
@@ -16706,20 +16706,20 @@
       "localizations": {
         "cs": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "V režimu seznamu povolených bude Mos obsluhovat jen myši zaškrtnuté v seznamu zařízení. Klávesnice to neovlivní."
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "Im Allowlist-Modus verarbeitet Mos nur die in der Geräteliste markierten Mäuse. Tastaturen sind nicht betroffen."
           }
         },
         "el": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "Στη λειτουργία λίστας επιτρεπόμενων, το Mos χειρίζεται μόνο τα επιλεγμένα ποντίκια της λίστας συσκευών. Τα πληκτρολόγια δεν επηρεάζονται."
           }
         },
         "en": {
@@ -16730,8 +16730,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "En mode liste autorisée, Mos ne gère que les souris cochées dans la liste des appareils. Les claviers ne sont pas concernés."
           }
         },
         "ja": {
@@ -16742,32 +16742,32 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "허용 목록 모드에서는 Mos가 기기 목록에서 선택된 마우스만 처리합니다. 키보드에는 영향을 주지 않습니다."
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "В режиме белого списка Mos обрабатывает только мыши, отмеченные в списке устройств. Клавиатуры не затрагиваются."
           }
         },
         "th": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "ในโหมดรายการที่อนุญาต Mos จะจัดการเฉพาะเมาส์ที่เลือกไว้ในรายการอุปกรณ์ แป้นพิมพ์จะไม่ได้รับผลกระทบ"
           }
         },
         "tr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "İzin listesi modunda Mos yalnızca cihaz listesinde işaretli fareleri işler. Klavyeler etkilenmez."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+            "state": "translated",
+            "value": "У режимі білого списку Mos обробляє лише миші, позначені у списку пристроїв. Клавіатури це не зачіпає."
           }
         },
         "zh-Hans": {

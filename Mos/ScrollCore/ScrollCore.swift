@@ -35,6 +35,8 @@ class ScrollCore: ScrollActionPort {
     var currentApplication: Application? // 用于区分按下热键及抬起时的作用目标
     // 例外设备数据
     var device: ScrollDevice?
+    // 停用 / 白名单下被热键 tap 忽略的按键
+    let bypassedHotkeyPresses = BypassedPressTracker()
     // 拦截层
     var scrollEventInterceptor: Interceptor?
     var hotkeyEventInterceptor: Interceptor?
@@ -305,11 +307,18 @@ class ScrollCore: ScrollActionPort {
             return nil
         }
 
-        // 停用 / 白名单: 忽略按下 (抬起与修饰键变化仍需处理, 避免焦点切换后状态卡住)
-        if type == .keyDown || type == .otherMouseDown,
-           InputBypass.shared.shouldBypass(event, isPointingEvent: type == .otherMouseDown) {
-            return nil
+        // 停用 / 白名单: 忽略整个按键过程; 抬起只在对应按下被忽略时忽略, 避免已按下的热键卡住
+        let bypassedPresses = ScrollCore.shared.bypassedHotkeyPresses
+        switch type {
+        case .keyDown, .otherMouseDown:
+            if bypassedPresses.shouldBypassDown(event, type: type) { return nil }
+        case .keyUp, .otherMouseUp:
+            if bypassedPresses.shouldBypassUp(event, type: type) { return nil }
+        default:
+            break
         }
+        // 修饰键: 忽略按下, 松开照常处理
+        let bypassesModifierPress = type == .flagsChanged && InputBypass.shared.shouldBypass(event, isPointingEvent: false)
 
         let keyCode = event.keyCode
         let mouseButton = UInt16(event.getIntegerValueField(.mouseEventButtonNumber))
@@ -337,7 +346,9 @@ class ScrollCore: ScrollActionPort {
             if hotkey.isModifierKey {
                 // 修饰键：通过 flagsChanged 事件检测
                 if isFlagsChanged && keyCode == hotkey.code {
-                    return event.flags.contains(hotkey.modifierMask)
+                    let isPressed = event.flags.contains(hotkey.modifierMask)
+                    if isPressed && bypassesModifierPress { return nil }
+                    return isPressed
                 }
             } else if hotkey.matches(event, keyCode: keyCode, mouseButton: mouseButton, isMouseEvent: isMouseEvent) {
                 // 普通按键或鼠标按键

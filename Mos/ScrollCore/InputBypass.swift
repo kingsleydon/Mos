@@ -45,3 +45,47 @@ class InputBypass {
         )
     }
 }
+
+/// 按下时被忽略的按键, 其重复与抬起也一并忽略 (按 类型/按键/来源设备 配对).
+/// 每个事件 tap 各持一份, 互不消费对方的记录
+class BypassedPressTracker {
+
+    private struct Press: Hashable {
+        let isMouse: Bool
+        let code: Int64
+        let sender: UInt64
+    }
+    private var presses = Set<Press>()
+
+    private func press(for event: CGEvent, type: CGEventType) -> Press? {
+        switch type {
+        case .otherMouseDown, .otherMouseUp:
+            let sender = PointingDeviceRegistry.shared.senderID(of: event) ?? 0
+            return Press(isMouse: true, code: event.getIntegerValueField(.mouseEventButtonNumber), sender: sender)
+        case .keyDown, .keyUp:
+            return Press(isMouse: false, code: event.getIntegerValueField(.keyboardEventKeycode), sender: 0)
+        default:
+            return nil
+        }
+    }
+
+    /// 按下: 是否忽略. 自动重复只跟随已忽略的按下, 不会开始新的忽略 (按住时切换焦点, 已生效的绑定继续生效)
+    func shouldBypassDown(_ event: CGEvent, type: CGEventType) -> Bool {
+        guard let press = press(for: event, type: type) else { return false }
+        if presses.contains(press) { return true }
+        if type == .keyDown && event.getIntegerValueField(.keyboardEventAutorepeat) != 0 { return false }
+        guard InputBypass.shared.shouldBypass(event, isPointingEvent: press.isMouse) else { return false }
+        presses.insert(press)
+        return true
+    }
+
+    /// 抬起: 仅当对应的按下被忽略时忽略
+    func shouldBypassUp(_ event: CGEvent, type: CGEventType) -> Bool {
+        guard let press = press(for: event, type: type) else { return false }
+        return presses.remove(press) != nil
+    }
+
+    func reset() {
+        presses.removeAll()
+    }
+}

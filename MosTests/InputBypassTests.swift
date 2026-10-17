@@ -54,4 +54,34 @@ final class InputBypassTests: XCTestCase {
         // 合成的鼠标事件无法识别来源设备, 白名单下视为未列出
         XCTAssertTrue(InputBypass.shared.shouldBypass(makeMouseEvent(), isPointingEvent: true))
     }
+
+    // MARK: - 按键过程配对
+
+    func testBypassedPressAlsoBypassesItsRelease() {
+        let tracker = BypassedPressTracker()
+        Options.shared.application.allowlist = true
+        XCTAssertTrue(tracker.shouldBypassDown(makeKeyEvent(), type: .keyDown))
+        // 抬起前恢复处理: 抬起仍需跟随按下被忽略
+        Options.shared.application.allowlist = false
+        let up = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false)!
+        XCTAssertTrue(tracker.shouldBypassUp(up, type: .keyUp))
+        XCTAssertFalse(tracker.shouldBypassUp(up, type: .keyUp), "each release pairs with one press")
+    }
+
+    func testReleaseOfProcessedPressIsNotBypassed() {
+        let tracker = BypassedPressTracker()
+        XCTAssertFalse(tracker.shouldBypassDown(makeKeyEvent(), type: .keyDown))
+        // 按住时切换到被忽略的应用: 抬起仍要交给 Mos 释放
+        Options.shared.application.allowlist = true
+        let up = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false)!
+        XCTAssertFalse(tracker.shouldBypassUp(up, type: .keyUp))
+    }
+
+    func testAutorepeatDoesNotStartBypass() {
+        let tracker = BypassedPressTracker()
+        Options.shared.application.allowlist = true
+        let repeatEvent = makeKeyEvent()
+        repeatEvent.setIntegerValueField(.keyboardEventAutorepeat, value: 1)
+        XCTAssertFalse(tracker.shouldBypassDown(repeatEvent, type: .keyDown), "repeats of a processed press keep going to Mos")
+    }
 }

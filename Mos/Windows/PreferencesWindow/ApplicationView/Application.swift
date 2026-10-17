@@ -75,10 +75,12 @@ class Application: Codable, Equatable, ScrollProfile {
         try container.encode(path, forKey: .path)
         try container.encodeIfPresent(displayName, forKey: .displayName)
         try container.encode(disabled, forKey: .disabled)
-        // 同时写入旧版字段, 便于回退版本时仍能读取
+        // 同时写入旧版字段, 便于回退版本时仍能读取:
+        // 旧版把 inherit=false 的 scroll 视为整组配置, 因此写入生效值 (继承的字段取当前全局值).
+        // 新版读取时, 未覆盖字段的本地值不参与解析, 开始覆盖时也会重新从生效值物化
         try container.encode(inherit, forKey: .inherit)
         try container.encode(overrides.map { $0.rawValue }.sorted(), forKey: .overrides)
-        try container.encode(scroll, forKey: .scroll)
+        try container.encode(OPTIONS_SCROLL_DEFAULT(values: effectiveValues()), forKey: .scroll)
         try container.encodeIfPresent(buttons, forKey: .buttons)
     }
 
