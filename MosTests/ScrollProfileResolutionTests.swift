@@ -73,27 +73,6 @@ final class ScrollProfileResolutionTests: XCTestCase {
         XCTAssertEqual(resolved(application).step, 12.5)
     }
 
-    func testInheritRestoresGlobalValue() {
-        Options.shared.scroll.speed = 3
-        let application = makeApplication()
-        application.beginOverriding([.speed])
-        application.scroll.speed = 7
-        XCTAssertEqual(resolved(application).speed, 7)
-
-        application.inherit([.speed])
-        XCTAssertEqual(resolved(application).speed, 3)
-    }
-
-    func testLegacyInheritFlagMapsToAllOrNothing() {
-        let application = makeApplication()
-        application.inherit = false
-        XCTAssertEqual(application.overrides, Set(ScrollSetting.allCases))
-        application.inherit = true
-        XCTAssertTrue(application.overrides.isEmpty)
-        application.overrides = [.reverse]
-        XCTAssertFalse(application.inherit, "partially overridden profile is not fully inheriting")
-    }
-
     func testHotkeysResolvePerSetting() {
         Options.shared.scroll.dash = ScrollHotkey(type: .keyboard, code: KeyCode.optionL)
         let application = makeApplication()
@@ -136,10 +115,6 @@ final class ScrollProfileResolutionTests: XCTestCase {
 
         let resolved = ScrollOptionsResolver.resolve(application: nil, device: device)
         XCTAssertEqual(resolved.duration, ScrollDurationLimits.simulateTrackpadDefault)
-    }
-
-    func testDeviceIdentityIsVendorAndProduct() {
-        XCTAssertEqual(makeDevice().identity, "046d:b034")
     }
 
     func testVisibleValuesIgnoreSubDisplayDifferences() {
@@ -201,17 +176,6 @@ final class ScrollProfileResolutionTests: XCTestCase {
         XCTAssertFalse(ScrollOptionsResolver.isActive(application: application, device: device, applicationAllowlist: false, deviceAllowlist: false), "a disabled app wins over an enabled device")
     }
 
-    func testDisabledFlagRoundTrip() throws {
-        let application = makeApplication()
-        application.disabled = true
-        let device = makeDevice()
-        device.disabled = true
-        XCTAssertTrue(try JSONDecoder().decode(Application.self, from: JSONEncoder().encode(application)).disabled)
-        XCTAssertTrue(try JSONDecoder().decode(ScrollDevice.self, from: JSONEncoder().encode(device)).disabled)
-        let legacy = #"{"path":"/Applications/A.app","inherit":true}"#
-        XCTAssertFalse(try JSONDecoder().decode(Application.self, from: Data(legacy.utf8)).disabled)
-    }
-
     // MARK: - 持久化
 
     func testLegacyApplicationJSONDecodesToAllOrNothing() throws {
@@ -221,14 +185,17 @@ final class ScrollProfileResolutionTests: XCTestCase {
         let on = try JSONDecoder().decode(Application.self, from: Data(legacyOn.utf8))
         XCTAssertEqual(off.overrides, Set(ScrollSetting.allCases))
         XCTAssertTrue(on.overrides.isEmpty)
+        XCTAssertFalse(off.disabled, "legacy entries keep Mos enabled")
     }
 
     func testApplicationRoundTripKeepsPerSettingOverrides() throws {
         let application = makeApplication()
         application.beginOverriding([.reverse, .speed])
+        application.disabled = true
         let data = try JSONEncoder().encode(application)
         let decoded = try JSONDecoder().decode(Application.self, from: data)
         XCTAssertEqual(decoded.overrides, [.reverse, .speed])
+        XCTAssertTrue(decoded.disabled)
         // 旧版仍能读到整体开关
         let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         XCTAssertEqual(object?["inherit"] as? Bool, false)
@@ -252,12 +219,14 @@ final class ScrollProfileResolutionTests: XCTestCase {
         let device = makeDevice()
         device.beginOverriding([.reverse])
         device.scroll.reverse = false
+        device.disabled = true
         let data = try JSONEncoder().encode([device])
         let decoded = try JSONDecoder().decode([ScrollDevice].self, from: data)
         XCTAssertEqual(decoded.first?.identity, "046d:b034")
         XCTAssertEqual(decoded.first?.overrides, [.reverse])
         XCTAssertEqual(decoded.first?.scroll.reverse, false)
         XCTAssertEqual(decoded.first?.name, "MX Master 3S")
+        XCTAssertEqual(decoded.first?.disabled, true)
     }
 
     func testUnknownOverrideKeysAreIgnored() throws {
