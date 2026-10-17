@@ -437,6 +437,10 @@ class ScrollCore: ScrollActionPort {
                 placeAt: .tailAppendEventTap,
                 for: .listenOnly
             )
+            // tap 重启期间可能丢失抬起事件, 清除忽略记录以免之后的按键被误吞
+            hotkeyEventInterceptor?.onRestart = { [weak self] in
+                self?.bypassedHotkeyPresses.reset()
+            }
             mouseEventInterceptor = try Interceptor(
                 event: mouseLeftEventMask,
                 handleBy: mouseLeftEventCallBack,
@@ -456,6 +460,7 @@ class ScrollCore: ScrollActionPort {
         // Guard
         if !isActive {return}
         isActive = false
+        bypassedHotkeyPresses.reset()
         // 停止滚动事件发送器
         ScrollPoster.shared.stop()
         ScrollPoster.shared.stopKeeper()

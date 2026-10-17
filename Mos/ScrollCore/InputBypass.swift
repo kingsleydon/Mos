@@ -60,7 +60,9 @@ class BypassedPressTracker {
     private func press(for event: CGEvent, type: CGEventType) -> Press? {
         switch type {
         case .otherMouseDown, .otherMouseUp:
-            let sender = PointingDeviceRegistry.shared.senderID(of: event) ?? 0
+            // 无底层 HID 事件 (合成 / 远程) 时以来源进程区分, 避免不同来源共用一条记录
+            let sender = PointingDeviceRegistry.shared.senderID(of: event)
+                ?? (1 << 48 | UInt64(UInt32(truncatingIfNeeded: event.getIntegerValueField(.eventSourceUnixProcessID))))
             return Press(isMouse: true, code: event.getIntegerValueField(.mouseEventButtonNumber), sender: sender)
         case .keyDown, .keyUp:
             return Press(isMouse: false, code: event.getIntegerValueField(.keyboardEventKeycode), sender: 0)

@@ -111,6 +111,7 @@ class ButtonCore {
             dispatchInterceptor?.stop()
             dispatchInterceptor = nil
             InputProcessor.shared.clearActiveBindings()
+            bypassedPresses.reset()
             isActive = false
         }
     }

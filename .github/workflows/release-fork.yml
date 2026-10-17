@@ -29,9 +29,12 @@ jobs:
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS=MOS_FORK_BUILD \
             MARKETING_VERSION="${VERSION#v}" \
+            CURRENT_PROJECT_VERSION="$(date -u +%Y%m%d).${{ github.run_number }}" \
             build
 
-      # 去掉上游更新源, 再重新做 ad-hoc 签名 (修改 Info.plist 会使签名失效)
+      # 去掉上游更新源, 再重新做 ad-hoc 签名 (修改 Info.plist 会使签名失效).
+      # 不加 --options runtime: 强化运行时的库验证要求同一 Team ID, ad-hoc 签名没有 Team ID,
+      # 开启后将无法加载内嵌的 Sparkle.framework. 强化运行时只在公证时必需.
       - name: Remove updater feed and re-sign
         run: |
           APP="build/DerivedData/Build/Products/Release/Mos.app"
@@ -46,7 +49,12 @@ jobs:
 
       - name: Package
         run: |
-          ditto -c -k --keepParent "build/DerivedData/Build/Products/Release/Mos.app" "build/Mos-${VERSION#v}.zip"
+          # 不打包资源分叉/扩展属性, 避免 ._* 文件解压后破坏框架签名
+          ditto -c -k --norsrc --noextattr --keepParent "build/DerivedData/Build/Products/Release/Mos.app" "build/Mos-${VERSION#v}.zip"
+          if unzip -l "build/Mos-${VERSION#v}.zip" | grep -qE '(^|/)\._|__MACOSX'; then echo "AppleDouble files in zip" >&2; exit 1; fi
+          # 解压后的副本必须仍能通过签名校验
+          mkdir -p build/verify && ditto -x -k "build/Mos-${VERSION#v}.zip" build/verify
+          codesign --verify --deep --strict --verbose=2 build/verify/Mos.app
           shasum -a 256 "build/Mos-${VERSION#v}.zip"
 
       - name: Create draft release
