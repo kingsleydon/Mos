@@ -191,7 +191,7 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     
     // 重置
     @IBAction func resetToDefaultClick(_ sender: NSButton) {
-        // 覆盖层上下文: 恢复为全局设定 (取消全部覆盖)
+        // 覆盖层上下文: 恢复为全局设定 (取消全部覆盖, 包括与全局恰好一致的)
         if let profile = currentScrollProfile {
             profile.inherit(profile.supportedSettings)
         } else {
@@ -462,12 +462,13 @@ extension PreferencesScrollingViewController {
         syncViewWithOptions()
     }
 
-    /// 已覆盖的行: 标题使用主文字色, 并显示恢复按钮
+    /// 与全局不同的行: 标题使用主文字色, 并显示恢复按钮
     private func updateInheritIndicators() {
-        guard currentScrollProfile != nil else { return }
+        guard let profile = currentScrollProfile else { return }
+        let differing = profile.differingSettings()
         for (setting, label) in settingLabels {
             guard let label = label else { continue }
-            let isOverridden = isSettingOverridden(setting)
+            let isOverridden = differing.contains(setting)
             label.textColor = isOverridden ? NSColor.labelColor : NSColor.secondaryLabelColor
             if !isSettingEditable(setting) {
                 label.toolTip = NSLocalizedString("scrollSettingNotPerDeviceTooltip", comment: "Tooltip on scroll settings that cannot be overridden per device")
@@ -487,11 +488,8 @@ extension PreferencesScrollingViewController {
         return Options.shared.scroll.values != DefaultConfigForCompare.values
     }
 
-    /// 覆盖层的生效值是否与全局配置不同 (按界面显示精度比较)
+    /// 覆盖层是否有与全局不同的设定项
     private func differsFromGlobal() -> Bool {
-        guard let profile = currentScrollProfile else { return false }
-        let effective = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [profile])
-        let global = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [])
-        return effective.visible != global.visible
+        return !(currentScrollProfile?.differingSettings().isEmpty ?? true)
     }
 }

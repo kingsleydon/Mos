@@ -85,27 +85,23 @@ class PreferencesScrollingWithApplicationViewController: NSViewController {
         if let device = currentTargetDevice {
             device.displayName = name
             if let validParentTableView = parentTableView, let validParentTableRow = parentTableRow {
-                validParentTableView.reloadData(forRowIndexes: [validParentTableRow], columnIndexes: [0])
+                validParentTableView.reloadData(forRowIndexes: [validParentTableRow], columnIndexes: IndexSet(integersIn: 0..<validParentTableView.numberOfColumns))
             }
             return
         }
         if name.count > 0 {
             currentTargetApplication?.displayName = name
             if let validParentTableView = parentTableView, let validParentTableRow = parentTableRow {
-                validParentTableView.reloadData(forRowIndexes: [validParentTableRow], columnIndexes: [0, 1, 2])
+                validParentTableView.reloadData(forRowIndexes: [validParentTableRow], columnIndexes: IndexSet(integersIn: 0..<validParentTableView.numberOfColumns))
             }
         }
     }
 
-    // 继承: 有任何覆盖时恢复全部继承, 否则以当前生效值覆盖全部设定项
+    // 继承: 覆盖即与全局不同的设定项; 点击恢复全部继承 (全部继承时不可点击)
     // Logi divert 用量同步由 LogiUsageBootstrap 的 Options 订阅自动完成 (overrides didSet → .application)
     @IBAction func inheritGlobalSettingClick(_ sender: NSButton) {
         guard let profile = currentScrollProfile else { return }
-        if profile.overrides.isEmpty {
-            profile.beginOverriding(profile.supportedSettings)
-        } else {
-            profile.inherit(profile.supportedSettings)
-        }
+        profile.inherit(profile.supportedSettings)
         // 内容视图同步后会回调 syncViewWithOptions
         if let vaildContentViewController = currentContentViewController {
             vaildContentViewController.syncViewWithOptions()
@@ -121,18 +117,14 @@ class PreferencesScrollingWithApplicationViewController: NSViewController {
 extension PreferencesScrollingWithApplicationViewController {
     // 同步界面与设置
     func syncViewWithOptions() {
-        // 继承: 全部继承 / 部分覆盖 / 全部覆盖
+        // 继承: 全部继承 / 部分设定与全局不同
         guard let profile = currentScrollProfile else {
             inheritGlobalSettingCheckBox?.state = .off
             return
         }
-        if profile.overrides.isEmpty {
-            inheritGlobalSettingCheckBox?.state = .on
-        } else if profile.supportedSettings.isSubset(of: profile.overrides) {
-            inheritGlobalSettingCheckBox?.state = .off
-        } else {
-            inheritGlobalSettingCheckBox?.state = .mixed
-        }
+        let isInheritingAll = profile.differingSettings().isEmpty
+        inheritGlobalSettingCheckBox?.state = isInheritingAll ? .on : .mixed
+        inheritGlobalSettingCheckBox?.isEnabled = !isInheritingAll
     }
 
 }

@@ -118,6 +118,23 @@ extension ScrollProfile {
     func inherit(_ settings: Set<ScrollSetting>) {
         overrides.subtract(settings)
     }
+
+    /// 已覆盖且当前与全局不同 (按界面显示精度) 的设定项; 界面只展示这些
+    func differingSettings() -> Set<ScrollSetting> {
+        let effective = effectiveValues().visible
+        let global = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: []).visible
+        return overrides.filter { setting in
+            var candidate = global
+            setting.merge(from: effective, into: &candidate)
+            return candidate != global
+        }
+    }
+
+    /// 用户把设定改回与全局一致时恢复继承.
+    /// 只在编辑时调用: 全局之后变化导致的 "恰好一致" 不应取消用户的覆盖
+    func inheritSettingsMatchingGlobal(_ settings: Set<ScrollSetting>) {
+        inherit(settings.intersection(overrides).subtracting(differingSettings()))
+    }
 }
 
 /// 解析顺序: 全局 → 例外应用 → 例外设备 (后者优先)
@@ -176,13 +193,14 @@ extension ScrollSetting {
 extension ScrollProfile {
     /// 列表中展示的覆盖摘要
     func overrideSummary() -> String {
-        if overrides.isEmpty {
+        let differing = differingSettings()
+        if differing.isEmpty {
             return NSLocalizedString("overridesSummaryNone", comment: "Summary for an override entry that inherits every setting")
         }
-        if supportedSettings.isSubset(of: overrides) {
+        if supportedSettings.isSubset(of: differing) {
             return NSLocalizedString("overridesSummaryAll", comment: "Summary for an override entry that overrides every setting")
         }
         let separator = NSLocalizedString("overridesSummarySeparator", comment: "Separator between setting names in the override summary")
-        return ScrollSetting.allCases.filter { overrides.contains($0) }.map { $0.localizedName }.joined(separator: separator)
+        return ScrollSetting.allCases.filter { differing.contains($0) }.map { $0.localizedName }.joined(separator: separator)
     }
 }

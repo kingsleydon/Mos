@@ -150,6 +150,33 @@ final class ScrollProfileResolutionTests: XCTestCase {
         XCTAssertNotEqual(ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [application]).visible, global.visible)
     }
 
+    func testEditingBackToGlobalValueInheritsAgain() {
+        Options.shared.scroll.reverse = true
+        let application = makeApplication()
+        application.beginOverriding([.reverse])
+        application.scroll.reverse = false
+        application.inheritSettingsMatchingGlobal([.reverse])
+        XCTAssertEqual(application.overrides, [.reverse], "a value that differs from global stays overridden")
+        application.scroll.reverse = true
+        application.inheritSettingsMatchingGlobal([.reverse])
+        XCTAssertTrue(application.overrides.isEmpty, "setting it back to the global value inherits again")
+    }
+
+    func testOverrideMatchingGlobalAfterGlobalChangeIsKeptButNotShown() {
+        Options.shared.scroll.reverse = true
+        let application = makeApplication()
+        application.beginOverriding([.reverse])
+        application.scroll.reverse = false
+        XCTAssertEqual(application.differingSettings(), [.reverse])
+        // 全局之后也改为关闭: 覆盖保留, 但界面视为一致
+        Options.shared.scroll.reverse = false
+        XCTAssertEqual(application.overrides, [.reverse])
+        XCTAssertTrue(application.differingSettings().isEmpty)
+        // 全局再改回开启: 覆盖重新生效
+        Options.shared.scroll.reverse = true
+        XCTAssertFalse(application.isReverse())
+    }
+
     // MARK: - 停用与白名单
 
     func testUnlistedEntriesFollowAllowlistMode() {

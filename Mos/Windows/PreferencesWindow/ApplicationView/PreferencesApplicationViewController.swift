@@ -58,7 +58,8 @@ class PreferencesApplicationViewController: NSViewController {
         Utils.attachImage(to: manuallySelectFromFinderMenuItem, withImage: #imageLiteral(resourceName: "SF.tray"))
         // 设置表格代理
         tableView.delegate = self
-        // 类型切换
+        // 启用开关列, 类型切换
+        setupEnabledColumn()
         setupModeControl()
         for field in [tableHeadTitle, tableEmptyTitle, tableEmptyDescription, createButtonTitle, createButtonDescription] {
             if let field = field { applicationTexts[field] = field.stringValue }
@@ -69,9 +70,14 @@ class PreferencesApplicationViewController: NSViewController {
         // 初始化按钮状态
         updateDelButtonState()
     }
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        alignTableHeadTitle()
+    }
     override func viewWillAppear() {
         // 设备可能在面板外被识别, 每次显示时刷新
         tableView.reloadData()
+        DispatchQueue.main.async { [weak self] in self?.alignTableHeadTitle() }
         // 检查表格数据
         toggleNoDataHint()
         // 设置添加按钮回调
@@ -182,6 +188,7 @@ extension PreferencesApplicationViewController {
         mode = nextMode
         tableView.deselectAll(nil)
         tableView.reloadData()
+        DispatchQueue.main.async { [weak self] in self?.alignTableHeadTitle() }
         syncViewWithOptions()
         toggleNoDataHint()
         updateDelButtonState()
@@ -240,8 +247,51 @@ extension PreferencesApplicationViewController {
 extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableViewDataSource {
     // 每一列在 Storybroad 中的 identifier
     fileprivate enum CellIdentifiers {
+        static let enabledCell = "enabledCell"
         static let applicationCell = "applicationCell"
         static let scrollingCell = "scrollingCell"
+    }
+    private static let enabledColumnWidth: CGFloat = 30
+
+    /// 行首的启用开关单独成列 (Storyboard 只定义了应用与滚动两列)
+    private func setupEnabledColumn() {
+        let width = PreferencesApplicationViewController.enabledColumnWidth
+        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(CellIdentifiers.enabledCell))
+        column.width = width
+        column.minWidth = width
+        column.maxWidth = width
+        column.resizingMask = []
+        tableView.addTableColumn(column)
+        tableView.moveColumn(tableView.numberOfColumns - 1, toColumn: 0)
+        // 总宽度不变: 从应用列中让出
+        if let applicationColumn = tableView.tableColumn(withIdentifier: NSUserInterfaceItemIdentifier(CellIdentifiers.applicationCell)) {
+            applicationColumn.width -= width
+        }
+    }
+
+    /// 表头标题与应用/设备图标左对齐
+    private func alignTableHeadTitle() {
+        guard let title = tableHeadTitle, let container = title.superview,
+              let leading = container.constraints.first(where: { $0.firstItem === title && $0.firstAttribute == .leading }) else {
+            return
+        }
+        let applicationColumn = tableView.column(withIdentifier: NSUserInterfaceItemIdentifier(CellIdentifiers.applicationCell))
+        guard applicationColumn >= 0 else { return }
+        let iconX: CGFloat
+        if let imageView = (tableView.view(atColumn: applicationColumn, row: 0, makeIfNecessary: false) as? NSTableCellView)?.imageView {
+            iconX = imageView.convert(imageView.bounds, to: container).minX
+        } else {
+            // 尚无行视图: 按列位置 + 单元格内图标边距 (Storyboard 中为 20) 估算
+            iconX = tableView.convert(tableView.rect(ofColumn: applicationColumn), to: container).minX + 20
+        }
+        if abs(leading.constant - iconX) > 0.5 {
+            leading.constant = iconX
+        }
+    }
+
+    /// 刷新某行的所有列 (名称, 摘要, 启用开关)
+    func reloadRow(_ row: Int) {
+        tableView.reloadData(forRowIndexes: [row], columnIndexes: IndexSet(integersIn: 0..<tableView.numberOfColumns))
     }
     private var currentItemCount: Int {
         switch mode {
@@ -278,7 +328,7 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         // 关闭后刷新该行的覆盖摘要
         scrollingWithApplicationViewController.onClose = { [weak self] in
             guard let self = self, row < self.currentItemCount else { return }
-            self.tableView.reloadData(forRowIndexes: [row], columnIndexes: [0])
+            self.reloadRow(row)
         }
         // 展示到指定位置
         present(scrollingWithApplicationViewController, asPopoverRelativeTo: sender.bounds, of: sender, preferredEdge: NSRectEdge.maxX, behavior: NSPopover.Behavior.transient)
@@ -288,6 +338,9 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         guard let tableColumnIdentifier = tableColumn?.identifier,
               let cell = tableView.makeView(withIdentifier: tableColumnIdentifier, owner: self) as? NSTableCellView else {
             return nil
+        }
+        if tableColumnIdentifier.rawValue == CellIdentifiers.enabledCell {
+            return enabledCell(row: row)
         }
         // 生成每行的 Cell
         switch tableColumnIdentifier.rawValue {
@@ -299,13 +352,11 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
                     cell.imageView?.image = application.getIcon()
                     cell.imageView?.toolTip = application.path
                     cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(application.getName(), summary: application.overrideSummary(), disabled: application.disabled)
-                    updateEnabledCheckBox(in: cell, row: row, disabled: application.disabled)
                 case .devices:
                     guard let device = Options.shared.device.devices.get(by: row) else { return nil }
                     cell.imageView?.image = PreferencesApplicationViewController.deviceIcon()
                     cell.imageView?.toolTip = device.identity
                     cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(device.getName(), summary: device.overrideSummary(), disabled: device.disabled)
-                    updateEnabledCheckBox(in: cell, row: row, disabled: device.disabled)
                 }
                 return cell
             // 设定: 滚动
@@ -335,30 +386,35 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         result.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: result.length))
         return result
     }
-    /// 行首的启用开关 (Cell 会复用, 首次使用时创建)
-    private func updateEnabledCheckBox(in cell: NSTableCellView, row: Int, disabled: Bool) {
-        let identifier = NSUserInterfaceItemIdentifier("overrideEnabledCheckBox")
-        let checkBox: NSButton
-        if let existing = cell.subviews.first(where: { $0.identifier == identifier }) as? NSButton {
-            checkBox = existing
+    /// 启用开关单元格 (代码创建, 按列标识复用)
+    private func enabledCell(row: Int) -> NSView {
+        let identifier = NSUserInterfaceItemIdentifier(CellIdentifiers.enabledCell)
+        let cell: NSTableCellView
+        if let reused = tableView.makeView(withIdentifier: identifier, owner: self) as? NSTableCellView {
+            cell = reused
         } else {
-            checkBox = NSButton(checkboxWithTitle: "", target: self, action: #selector(entryEnabledClick(_:)))
-            checkBox.identifier = identifier
+            cell = NSTableCellView()
+            cell.identifier = identifier
+            let checkBox = NSButton(checkboxWithTitle: "", target: self, action: #selector(entryEnabledClick(_:)))
             checkBox.translatesAutoresizingMaskIntoConstraints = false
             cell.addSubview(checkBox)
-            var constraints = [checkBox.centerYAnchor.constraint(equalTo: cell.centerYAnchor)]
-            if let imageView = cell.imageView {
-                constraints.append(checkBox.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: -10))
-            } else {
-                constraints.append(checkBox.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 2))
-            }
-            NSLayoutConstraint.activate(constraints)
+            NSLayoutConstraint.activate([
+                checkBox.centerXAnchor.constraint(equalTo: cell.centerXAnchor),
+                checkBox.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
+            ])
+        }
+        guard let checkBox = cell.subviews.first as? NSButton else { return cell }
+        let disabled: Bool
+        switch mode {
+        case .applications: disabled = Options.shared.application.applications.get(by: row)?.disabled ?? false
+        case .devices: disabled = Options.shared.device.devices.get(by: row)?.disabled ?? false
         }
         checkBox.tag = row
         checkBox.state = disabled ? .off : .on
         checkBox.toolTip = mode == .applications
             ? NSLocalizedString("overridesEnableApplicationTooltip", comment: "Tooltip of the checkbox that turns Mos on or off for an application")
             : NSLocalizedString("overridesEnableDeviceTooltip", comment: "Tooltip of the checkbox that turns Mos on or off for a device")
+        return cell
     }
 
     @objc private func entryEnabledClick(_ sender: NSButton) {
@@ -370,7 +426,7 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         case .devices:
             Options.shared.device.devices.get(by: row)?.disabled = disabled
         }
-        tableView.reloadData(forRowIndexes: [row], columnIndexes: [0])
+        reloadRow(row)
     }
 
     // 行高

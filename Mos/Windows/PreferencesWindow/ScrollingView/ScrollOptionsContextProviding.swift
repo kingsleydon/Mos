@@ -26,7 +26,7 @@ extension ScrollOptionsContextProviding {
         return OPTIONS_SCROLL_DEFAULT(values: profile.effectiveValues())
     }
 
-    /// 修改设定项: 覆盖层上下文中先转为覆盖, 再写入覆盖层自身的配置
+    /// 修改设定项: 覆盖层上下文中先转为覆盖, 再写入覆盖层自身的配置; 改回与全局一致时恢复继承
     func updateScrollOptions(_ settings: Set<ScrollSetting>, _ body: (OPTIONS_SCROLL_DEFAULT) -> Void) {
         guard let profile = currentScrollProfile else {
             body(Options.shared.scroll)
@@ -35,15 +35,12 @@ extension ScrollOptionsContextProviding {
         guard settings.isSubset(of: profile.supportedSettings) else { return }
         profile.beginOverriding(settings)
         body(profile.scroll)
+        profile.inheritSettingsMatchingGlobal(settings)
     }
 
     func isSettingEditable(_ setting: ScrollSetting) -> Bool {
         guard let profile = currentScrollProfile else { return true }
         return profile.supportedSettings.contains(setting)
-    }
-
-    func isSettingOverridden(_ setting: ScrollSetting) -> Bool {
-        return currentScrollProfile?.isOverridden(setting) ?? false
     }
 
     func updateSmoothDependentControl(_ control: NSButton?, isOn: Bool) {
