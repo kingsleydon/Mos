@@ -69,7 +69,14 @@ enum LogiUsageBootstrap {
     }
 
     private static func appScrollCodes(app: Application, role: ScrollRole) -> Set<UInt16> {
-        guard !app.inherit else { return [] }
+        let setting: ScrollSetting = {
+            switch role {
+            case .dash:   return .dash
+            case .toggle: return .toggle
+            case .block:  return .block
+            }
+        }()
+        guard app.isOverridden(setting) else { return [] }
         let hotkey: ScrollHotkey? = {
             switch role {
             case .dash:   return app.scroll.dash

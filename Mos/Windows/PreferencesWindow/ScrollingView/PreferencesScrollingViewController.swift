@@ -10,9 +10,21 @@ import Cocoa
 
 class PreferencesScrollingViewController: NSViewController, ScrollOptionsContextProviding {
 
-    // Target application
-    // - Using when the VC is inside the Application Setting Popup
+    // Target application / device
+    // - Using when the VC is inside the Application / Device Setting Popup
     var currentTargetApplication: Application?
+    var currentTargetDevice: ScrollDevice?
+    // 设定变更回调 (供外层容器同步继承状态)
+    var onOptionsChanged: (() -> Void)?
+    // UI Elements: 行标题
+    @IBOutlet weak var smoothLabel: NSTextField?
+    @IBOutlet weak var reverseLabel: NSTextField?
+    @IBOutlet weak var dashLabel: NSTextField?
+    @IBOutlet weak var toggleLabel: NSTextField?
+    @IBOutlet weak var blockLabel: NSTextField?
+    @IBOutlet weak var stepLabel: NSTextField?
+    @IBOutlet weak var speedLabel: NSTextField?
+    @IBOutlet weak var durationLabel: NSTextField?
     // UI Elements
     @IBOutlet weak var scrollSmoothCheckBox: NSButton!
     @IBOutlet weak var scrollReverseCheckBox: NSButton!
@@ -44,6 +56,12 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     // KeyRecorder for custom hotkey recording
     private let keyRecorder = KeyRecorder()
     private weak var currentRecordingPopup: NSButton?
+    // 覆盖层上下文: 每行的 "恢复为全局设定" 按钮
+    private var inheritButtons: [ScrollSetting: NSButton] = [:]
+    private var inheritButtonOffsets: [ScrollSetting: NSLayoutConstraint] = [:]
+    // 全局上下文: 例外设备入口
+    private var devicePopUpButton: NSPopUpButton?
+    private var deviceMenuInfos: [String: PointingDeviceInfo] = [:]
 
     override func viewDidLoad() {
         // 禁止自动 Focus
@@ -56,6 +74,9 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         scrollDurationDescriptionDefaultText = scrollDurationDescriptionLabel?.stringValue
         // 设置 KeyRecorder 代理
         keyRecorder.delegate = self
+        // 覆盖层上下文: 按设定项继承; 全局上下文: 例外设备入口
+        setupInheritButtons()
+        setupDeviceOverrideRow()
         // 读取设置
         syncViewWithOptions()
     }
@@ -64,11 +85,13 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         super.prepare(for: segue, sender: sender)
         if let smoothPopover = segue.destinationController as? ScrollSmoothDetailSettingsPopoverViewController {
             smoothPopover.currentTargetApplication = currentTargetApplication
+            smoothPopover.currentTargetDevice = currentTargetDevice
             smoothPopover.onOptionsChanged = { [weak self] in
                 self?.syncViewWithOptions()
             }
         } else if let reversePopover = segue.destinationController as? ScrollReverseDetailSettingsPopoverViewController {
             reversePopover.currentTargetApplication = currentTargetApplication
+            reversePopover.currentTargetDevice = currentTargetDevice
             reversePopover.onOptionsChanged = { [weak self] in
                 self?.syncViewWithOptions()
             }
@@ -77,13 +100,13 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     
     // 平滑
     @IBAction func scrollSmoothClick(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().smooth = sender.state.rawValue != 0
+        updateScrollOptions([.smooth]) { $0.smooth = sender.state.rawValue != 0 }
         syncViewWithOptions()
     }
 
     // 翻转
     @IBAction func scrollReverseClick(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().reverse = sender.state.rawValue != 0
+        updateScrollOptions([.reverse]) { $0.reverse = sender.state.rawValue != 0 }
         syncViewWithOptions()
     }
     
@@ -94,7 +117,7 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     }
     // 加速键 - 清除绑定
     @IBAction func dashKeyDelButtonClick(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().dash = nil
+        updateScrollOptions([.dash]) { $0.dash = nil }
         syncViewWithOptions()
     }
     // 转换键 - 点击触发录制
@@ -104,7 +127,7 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     }
     // 转换键 - 清除绑定
     @IBAction func toggleKeyDelButtonClick(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().toggle = nil
+        updateScrollOptions([.toggle]) { $0.toggle = nil }
         syncViewWithOptions()
     }
     // 禁用键 - 点击触发录制
@@ -114,7 +137,7 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     }
     // 禁用键 - 清除绑定
     @IBAction func disableKeyDelButtonClick(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().block = nil
+        updateScrollOptions([.block]) { $0.block = nil }
         syncViewWithOptions()
     }
     
@@ -129,7 +152,7 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         setScrollStep(value: sender.doubleValue)
     }
     func setScrollStep(value: Double) {
-        getTargetApplicationScrollOptions().step = value
+        updateScrollOptions([.step]) { $0.step = value }
         syncViewWithOptions()
     }
     
@@ -144,7 +167,7 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         setScrollSpeed(value: sender.doubleValue)
     }
     func setScrollSpeed(value: Double) {
-        getTargetApplicationScrollOptions().speed = value
+        updateScrollOptions([.speed]) { $0.speed = value }
         syncViewWithOptions()
     }
     
@@ -159,19 +182,18 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         setScrollDuration(value: sender.doubleValue)
     }
     func setScrollDuration(value: Double) {
-        let scrollOptions = getTargetApplicationScrollOptions()
-        if scrollOptions.smoothSimTrackpad {
-            scrollOptions.duration = ScrollDurationLimits.simulateTrackpadDefault
-        } else {
-            scrollOptions.duration = value
+        let isLocked = getTargetApplicationScrollOptions().smoothSimTrackpad
+        updateScrollOptions([.duration]) { scrollOptions in
+            scrollOptions.duration = isLocked ? ScrollDurationLimits.simulateTrackpadDefault : value
         }
         syncViewWithOptions()
     }
     
     // 重置
     @IBAction func resetToDefaultClick(_ sender: NSButton) {
-        if let target = currentTargetApplication {
-            target.scroll = OPTIONS_SCROLL_DEFAULT()
+        if let profile = currentScrollProfile {
+            profile.scroll = OPTIONS_SCROLL_DEFAULT()
+            profile.overrides = profile.supportedSettings
         } else {
             Options.shared.scroll = OPTIONS_SCROLL_DEFAULT()
         }
@@ -186,68 +208,71 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
 extension PreferencesScrollingViewController {
     // 同步界面与设置
     func syncViewWithOptions() {
-        // 是否继承配置
-        let isNotInherit = !isTargetApplicationInheritOptions()
-        // 滚动配置
+        // 滚动配置 (覆盖层上下文中为合并后的生效值)
         let scroll = getTargetApplicationScrollOptions()
         // 平滑
         scrollSmoothCheckBox.state = NSControl.StateValue(rawValue: scroll.smooth ? 1 : 0)
-        scrollSmoothCheckBox.isEnabled = isNotInherit
+        scrollSmoothCheckBox.isEnabled = isSettingEditable(.smooth)
         // 翻转
         scrollReverseCheckBox.state = NSControl.StateValue(rawValue: scroll.reverse ? 1 : 0)
-        scrollReverseCheckBox.isEnabled = isNotInherit
+        scrollReverseCheckBox.isEnabled = isSettingEditable(.reverse)
         // 加速键
-        updateHotkeyButton(dashKeyBindButton, delButton: dashKeyDelButton, hotkey: scroll.dash, enabled: isNotInherit)
+        updateHotkeyButton(dashKeyBindButton, delButton: dashKeyDelButton, hotkey: scroll.dash, enabled: isSettingEditable(.dash))
         // 转换键
-        updateHotkeyButton(toggleKeyBindButton, delButton: toggleKeyDelButton, hotkey: scroll.toggle, enabled: isNotInherit)
+        updateHotkeyButton(toggleKeyBindButton, delButton: toggleKeyDelButton, hotkey: scroll.toggle, enabled: isSettingEditable(.toggle))
         // 禁用键
-        updateHotkeyButton(disableKeyBindButton, delButton: disableKeyDelButton, hotkey: scroll.block, enabled: isNotInherit)
+        updateHotkeyButton(disableKeyBindButton, delButton: disableKeyDelButton, hotkey: scroll.block, enabled: isSettingEditable(.block))
         // 步长
         let step = scroll.step
+        let isStepEditable = isSettingEditable(.step)
         scrollStepSlider.doubleValue = step
-        scrollStepSlider.isEnabled = isNotInherit
+        scrollStepSlider.isEnabled = isStepEditable
         scrollStepStepper.doubleValue = step
-        scrollStepStepper.isEnabled = isNotInherit
+        scrollStepStepper.isEnabled = isStepEditable
         scrollStepInput.stringValue = String(format: "%.2f", step)
-        scrollStepInput.isEnabled = isNotInherit
+        scrollStepInput.isEnabled = isStepEditable
         // 速度
         let speed = scroll.speed
+        let isSpeedEditable = isSettingEditable(.speed)
         scrollSpeedSlider.doubleValue = speed
-        scrollSpeedSlider.isEnabled = isNotInherit
+        scrollSpeedSlider.isEnabled = isSpeedEditable
         scrollSpeedStepper.doubleValue = speed
-        scrollSpeedStepper.isEnabled = isNotInherit
+        scrollSpeedStepper.isEnabled = isSpeedEditable
         scrollSpeedInput.stringValue = String(format: "%.2f", speed)
-        scrollSpeedInput.isEnabled = isNotInherit
+        scrollSpeedInput.isEnabled = isSpeedEditable
         // 过渡
         let isSimTrackpadEnabled = scroll.smoothSimTrackpad
+        let isDurationEditable = isSettingEditable(.duration) && !isSimTrackpadEnabled
         let resolvedDuration: Double
         if isSimTrackpadEnabled {
             resolvedDuration = ScrollDurationLimits.simulateTrackpadDefault
-            if scroll.duration != resolvedDuration {
+            // 覆盖层的时长由解析层统一约束, 只需修正全局配置
+            if currentScrollProfile == nil && scroll.duration != resolvedDuration {
                 scroll.duration = resolvedDuration
             }
         } else {
             resolvedDuration = scroll.duration
         }
         scrollDurationSlider.doubleValue = resolvedDuration
-        scrollDurationSlider.isEnabled = isNotInherit && !isSimTrackpadEnabled
+        scrollDurationSlider.isEnabled = isDurationEditable
         scrollDurationStepper.doubleValue = resolvedDuration
-        scrollDurationStepper.isEnabled = isNotInherit && !isSimTrackpadEnabled
+        scrollDurationStepper.isEnabled = isDurationEditable
         scrollDurationInput.stringValue = String(format: "%.2f", resolvedDuration)
-        scrollDurationInput.isEnabled = isNotInherit && !isSimTrackpadEnabled
+        scrollDurationInput.isEnabled = isDurationEditable
         if isSimTrackpadEnabled {
             scrollDurationDescriptionLabel?.stringValue = scrollDurationLockedDescription
         } else if let defaultText = scrollDurationDescriptionDefaultText {
             scrollDurationDescriptionLabel?.stringValue = defaultText
         }
+        // 继承状态
+        updateInheritIndicators()
         // 更新重置按钮状态
         updateResetButtonState()
+        onOptionsChanged?()
     }
     // 更新重置按钮状态与显示
     func updateResetButtonState() {
-        let isNotInherit = !isTargetApplicationInheritOptions()
-        let scroll = getTargetApplicationScrollOptions()
-        let shouldShowResetButton = isNotInherit && scroll != DefaultConfigForCompare
+        let shouldShowResetButton = differsFromDefaults()
         // 动画过渡
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = ANIMATION.duration
@@ -352,14 +377,211 @@ extension PreferencesScrollingViewController: KeyRecorderDelegate {
         let hotkey = ScrollHotkey(from: event)
 
         if popup === dashKeyBindButton {
-            getTargetApplicationScrollOptions().dash = hotkey
+            updateScrollOptions([.dash]) { $0.dash = hotkey }
         } else if popup === toggleKeyBindButton {
-            getTargetApplicationScrollOptions().toggle = hotkey
+            updateScrollOptions([.toggle]) { $0.toggle = hotkey }
         } else if popup === disableKeyBindButton {
-            getTargetApplicationScrollOptions().block = hotkey
+            updateScrollOptions([.block]) { $0.block = hotkey }
         }
 
         currentRecordingPopup = nil
         syncViewWithOptions()
+    }
+}
+
+// MARK: - 按设定项继承
+extension PreferencesScrollingViewController {
+
+    private var settingLabels: [(ScrollSetting, NSTextField?)] {
+        return [
+            (.smooth, smoothLabel),
+            (.reverse, reverseLabel),
+            (.dash, dashLabel),
+            (.toggle, toggleLabel),
+            (.block, blockLabel),
+            (.step, stepLabel),
+            (.speed, speedLabel),
+            (.duration, durationLabel),
+        ]
+    }
+
+    /// 覆盖层上下文中, 在每行标题文字左侧放置 "恢复为全局设定" 按钮 (仅已覆盖时可见)
+    private func setupInheritButtons() {
+        guard currentScrollProfile != nil else { return }
+        for (setting, label) in settingLabels {
+            guard let label = label, let index = ScrollSetting.allCases.firstIndex(of: setting) else { continue }
+            let button = NSButton(title: "", target: self, action: #selector(inheritSettingClick(_:)))
+            button.tag = index
+            button.isBordered = false
+            button.imagePosition = .imageOnly
+            button.image = PreferencesScrollingViewController.inheritButtonImage()
+            button.toolTip = NSLocalizedString("scrollSettingUseGlobalTooltip", comment: "Tooltip of the button that makes an overridden scroll setting follow the global settings again")
+            if #available(macOS 10.14, *) {
+                button.contentTintColor = NSColor.controlAccentColor
+            }
+            button.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(button)
+            let offset = button.trailingAnchor.constraint(equalTo: label.trailingAnchor)
+            NSLayoutConstraint.activate([
+                offset,
+                button.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+                button.widthAnchor.constraint(equalToConstant: 12),
+                button.heightAnchor.constraint(equalToConstant: 12),
+            ])
+            inheritButtons[setting] = button
+            inheritButtonOffsets[setting] = offset
+        }
+    }
+
+    private static func inheritButtonImage() -> NSImage? {
+        if #available(macOS 11.0, *) {
+            let image = NSImage(systemSymbolName: "arrow.uturn.backward.circle.fill", accessibilityDescription: nil)
+            return image?.withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: 10, weight: .regular))
+        }
+        let image = NSImage(named: NSImage.refreshTemplateName)
+        image?.size = NSSize(width: 10, height: 10)
+        return image
+    }
+
+    @objc private func inheritSettingClick(_ sender: NSButton) {
+        guard ScrollSetting.allCases.indices.contains(sender.tag) else { return }
+        currentScrollProfile?.inherit([ScrollSetting.allCases[sender.tag]])
+        syncViewWithOptions()
+    }
+
+    /// 已覆盖的行: 标题使用主文字色, 并显示恢复按钮
+    private func updateInheritIndicators() {
+        guard currentScrollProfile != nil else { return }
+        for (setting, label) in settingLabels {
+            guard let label = label else { continue }
+            let isOverridden = isSettingOverridden(setting)
+            label.textColor = isOverridden ? NSColor.labelColor : NSColor.secondaryLabelColor
+            if !isSettingEditable(setting) {
+                label.toolTip = NSLocalizedString("scrollSettingNotPerDeviceTooltip", comment: "Tooltip on scroll settings that cannot be overridden per device")
+            } else {
+                label.toolTip = isOverridden ? nil : NSLocalizedString("scrollSettingInheritedTooltip", comment: "Tooltip on scroll settings that currently follow the global settings")
+            }
+            guard let button = inheritButtons[setting] else { continue }
+            button.isHidden = !isOverridden
+            // 标题右对齐, 按钮紧贴文字左侧
+            let textWidth = ceil(label.attributedStringValue.size().width)
+            inheritButtonOffsets[setting]?.constant = -(textWidth + 6)
+        }
+    }
+
+    /// 是否与默认配置不同 (覆盖层上下文只比较可覆盖的设定项)
+    private func differsFromDefaults() -> Bool {
+        let current = getTargetApplicationScrollOptions().values
+        let defaults = DefaultConfigForCompare.values
+        guard let profile = currentScrollProfile else { return current != defaults }
+        var comparable = defaults
+        for setting in profile.supportedSettings {
+            setting.merge(from: current, into: &comparable)
+        }
+        return comparable != defaults
+    }
+}
+
+// MARK: - 例外设备
+extension PreferencesScrollingViewController: NSMenuDelegate {
+
+    /// 全局上下文中, 在过渡设置与重置按钮之间插入 "设备" 行
+    private func setupDeviceOverrideRow() {
+        guard currentScrollProfile == nil,
+              let rowLabelAnchor = durationLabel,
+              let descriptionAnchor = scrollDurationDescriptionLabel,
+              let resetTopConstraint = view.constraints.first(where: {
+                  $0.firstItem === resetToDefaultsButton && $0.firstAttribute == .top && $0.secondItem === descriptionAnchor
+              }) else {
+            return
+        }
+        let smallFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+        // 标题
+        let label = NSTextField(labelWithString: NSLocalizedString("scrollDevicesTitle", comment: "Title of the per-device scroll settings row"))
+        label.font = smallFont
+        label.textColor = NSColor.secondaryLabelColor
+        label.alignment = .right
+        // 设备菜单
+        let popUp = NSPopUpButton(frame: .zero, pullsDown: true)
+        popUp.controlSize = .small
+        popUp.font = smallFont
+        popUp.addItem(withTitle: NSLocalizedString("scrollDevicesConfigure", comment: "Title of the pull-down menu listing mice for per-device scroll settings"))
+        popUp.menu?.delegate = self
+        // 说明
+        let description = NSTextField(labelWithString: NSLocalizedString("scrollDevicesDescription", comment: "Description of the per-device scroll settings row"))
+        description.font = smallFont
+        description.lineBreakMode = .byTruncatingTail
+        description.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        description.textColor = NSColor.secondaryLabelColor
+        for subview in [label, popUp, description] as [NSView] {
+            subview.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(subview)
+        }
+        resetTopConstraint.isActive = false
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: rowLabelAnchor.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: rowLabelAnchor.trailingAnchor),
+            label.centerYAnchor.constraint(equalTo: popUp.centerYAnchor),
+            popUp.topAnchor.constraint(equalTo: descriptionAnchor.bottomAnchor, constant: 16),
+            popUp.leadingAnchor.constraint(equalTo: scrollDurationSlider.leadingAnchor, constant: -2),
+            popUp.widthAnchor.constraint(greaterThanOrEqualToConstant: 160),
+            description.topAnchor.constraint(equalTo: popUp.bottomAnchor, constant: 6),
+            description.leadingAnchor.constraint(equalTo: scrollDurationSlider.leadingAnchor),
+            description.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            resetToDefaultsButton.topAnchor.constraint(equalTo: description.bottomAnchor, constant: 20),
+        ])
+        devicePopUpButton = popUp
+    }
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        guard menu === devicePopUpButton?.menu else { return }
+        // 下拉菜单的第一项是按钮标题
+        while menu.items.count > 1 {
+            menu.removeItem(at: 1)
+        }
+        deviceMenuInfos = [:]
+        // 已连接的鼠标 (最近滚动过的排在最前), 其后是已配置但未连接的设备
+        var infos = PointingDeviceRegistry.shared.connectedMice()
+        if let last = PointingDeviceRegistry.shared.lastScrollDevice {
+            infos.removeAll { $0.identity == last.identity }
+            infos.insert(last, at: 0)
+        }
+        let devices = Options.shared.device.devices
+        for index in 0..<devices.count {
+            guard let device = devices.get(by: index), !infos.contains(where: { $0.identity == device.identity }) else { continue }
+            infos.append(PointingDeviceInfo(vendorID: device.vendorID, productID: device.productID, name: device.name))
+        }
+        guard !infos.isEmpty else {
+            let item = menu.addItem(withTitle: NSLocalizedString("scrollDevicesNone", comment: "Shown when no mouse is connected"), action: nil, keyEquivalent: "")
+            item.isEnabled = false
+            return
+        }
+        for info in infos {
+            let saved = devices.get(by: info.identity)
+            let title = saved?.getName() ?? (info.name.isEmpty ? info.identity : info.name)
+            let item = menu.addItem(withTitle: title, action: #selector(deviceMenuItemClick(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = info.identity
+            item.toolTip = info.identity
+            // 勾选表示该设备存在覆盖
+            item.state = (saved?.overrides.isEmpty == false) ? .on : .off
+            deviceMenuInfos[info.identity] = info
+        }
+    }
+
+    @objc private func deviceMenuItemClick(_ sender: NSMenuItem) {
+        guard let identity = sender.representedObject as? String, let popUp = devicePopUpButton else { return }
+        let device: ScrollDevice
+        if let saved = Options.shared.device.devices.get(by: identity) {
+            device = saved
+        } else if let info = deviceMenuInfos[identity] {
+            device = ScrollDevice(info: info)
+            Options.shared.device.devices.append(device)
+        } else {
+            return
+        }
+        let controller = Utils.instantiateControllerFromStoryboard(withIdentifier: PANEL_IDENTIFIER.scrollingWithApplication) as PreferencesScrollingWithApplicationViewController
+        controller.updateTargetDevice(with: device)
+        present(controller, asPopoverRelativeTo: popUp.bounds, of: popUp, preferredEdge: NSRectEdge.maxX, behavior: NSPopover.Behavior.transient)
     }
 }

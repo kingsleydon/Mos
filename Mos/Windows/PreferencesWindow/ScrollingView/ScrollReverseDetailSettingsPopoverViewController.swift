@@ -6,6 +6,7 @@ class ScrollReverseDetailSettingsPopoverViewController: AdaptivePopover, ScrollO
     @IBOutlet weak var horizontalReverseCheckBox: NSButton?
 
     var currentTargetApplication: Application?
+    var currentTargetDevice: ScrollDevice?
     var onOptionsChanged: (() -> Void)?
 
     override func viewDidLoad() {
@@ -24,13 +25,13 @@ class ScrollReverseDetailSettingsPopoverViewController: AdaptivePopover, ScrollO
     }
 
     @IBAction func verticalReverseToggle(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().reverseVertical = sender.state == .on
+        updateScrollOptions([.reverse]) { $0.reverseVertical = sender.state == .on }
         syncViewWithOptions()
         onOptionsChanged?()
     }
 
     @IBAction func horizontalReverseToggle(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().reverseHorizontal = sender.state == .on
+        updateScrollOptions([.reverse]) { $0.reverseHorizontal = sender.state == .on }
         syncViewWithOptions()
         onOptionsChanged?()
     }

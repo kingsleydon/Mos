@@ -117,6 +117,14 @@ class ScrollUtils {
         return nil
     }
 
+    // 从 Devices 中取回产生该事件的设备的例外设置; 未配置任何设备时跳过识别
+    func getTargetDevice(from event: CGEvent) -> ScrollDevice? {
+        let devices = Options.shared.device.devices
+        guard devices.count > 0 else { return nil }
+        guard let info = PointingDeviceRegistry.shared.device(for: event) else { return nil }
+        return devices.get(by: info.identity)
+    }
+
     // MARK: - 远程桌面事件检测
     // 远程桌面事件检测缓存
     private var lastSourcePID: pid_t = 0
@@ -161,25 +169,20 @@ class ScrollUtils {
 
     // MARK: - 滚动参数: 热键
     // 返回 ScrollHotkey? 供 ScrollCore 使用
+    // 热键不随设备区分, 只按应用解析
     func optionsDashKey(application: Application?) -> ScrollHotkey? {
-        if let targetApplication = application {
-            return targetApplication.inherit ? Options.shared.scroll.dash : targetApplication.scroll.dash
-        } else {
-            return Options.shared.scroll.dash
-        }
+        return optionsHotkey(.dash, application: application) { $0.dash }
     }
     func optionsToggleKey(application: Application?) -> ScrollHotkey? {
-        if let targetApplication = application {
-            return targetApplication.inherit ? Options.shared.scroll.toggle : targetApplication.scroll.toggle
-        } else {
-            return Options.shared.scroll.toggle
-        }
+        return optionsHotkey(.toggle, application: application) { $0.toggle }
     }
     func optionsBlockKey(application: Application?) -> ScrollHotkey? {
-        if let targetApplication = application {
-            return targetApplication.inherit ? Options.shared.scroll.block : targetApplication.scroll.block
-        } else {
-            return Options.shared.scroll.block
+        return optionsHotkey(.block, application: application) { $0.block }
+    }
+    private func optionsHotkey(_ setting: ScrollSetting, application: Application?, _ field: (OPTIONS_SCROLL_DEFAULT) -> ScrollHotkey?) -> ScrollHotkey? {
+        if let targetApplication = application, targetApplication.isOverridden(setting) {
+            return field(targetApplication.scroll)
         }
+        return field(Options.shared.scroll)
     }
 }

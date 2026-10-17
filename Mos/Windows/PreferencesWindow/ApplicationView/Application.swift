@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class Application: Codable, Equatable {
+class Application: Codable, Equatable, ScrollProfile {
     
     // 基础
     var path: String // executablePath or bundlePath
@@ -16,9 +16,17 @@ class Application: Codable, Equatable {
     var displayName: String? = "" {
         didSet { Options.shared.markChanged(.application) }
     }
-    // 配置: 继承
-    var inherit = true {
+    // 配置: 已覆盖的设定项 (未覆盖的沿用全局配置)
+    var overrides: Set<ScrollSetting> = [] {
         didSet { Options.shared.markChanged(.application) }
+    }
+    // 配置: 继承 (兼容旧版整体继承开关: 全部继承 / 全部覆盖)
+    var inherit: Bool {
+        get { return overrides.isEmpty }
+        set { overrides = newValue ? [] : supportedSettings }
+    }
+    var supportedSettings: Set<ScrollSetting> {
+        return Set(ScrollSetting.allCases)
     }
     // 配置: 滚动
     var scroll = OPTIONS_SCROLL_DEFAULT() {
@@ -40,14 +48,33 @@ class Application: Codable, Equatable {
         path = try container.decodeIfPresent(String.self, forKey: .path) ?? ""
         // 名称
         displayName = try container.decodeIfPresent(String.self, forKey: .displayName) ?? ""
-        // 继承
-        inherit = try container.decodeIfPresent(Bool.self, forKey: .inherit) ?? true
+        // 继承: 新版按设定项记录; 旧版只有整体开关
+        if let rawOverrides = try container.decodeIfPresent([String].self, forKey: .overrides) {
+            overrides = Set(rawOverrides.compactMap { ScrollSetting(rawValue: $0) })
+        } else {
+            let legacyInherit = try container.decodeIfPresent(Bool.self, forKey: .inherit) ?? true
+            overrides = legacyInherit ? [] : Set(ScrollSetting.allCases)
+        }
         // 滚动
         scroll = try container.decodeIfPresent(OPTIONS_SCROLL_DEFAULT.self, forKey: .scroll) ?? OPTIONS_SCROLL_DEFAULT()
         // 按钮绑定
         buttons = try container.decodeIfPresent(OPTIONS_BUTTONS_DEFAULT.self, forKey: .buttons)
     }
     
+    private enum CodingKeys: String, CodingKey {
+        case path, displayName, inherit, overrides, scroll, buttons
+    }
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(path, forKey: .path)
+        try container.encodeIfPresent(displayName, forKey: .displayName)
+        // 同时写入旧版字段, 便于回退版本时仍能读取
+        try container.encode(inherit, forKey: .inherit)
+        try container.encode(overrides.map { $0.rawValue }.sorted(), forKey: .overrides)
+        try container.encode(scroll, forKey: .scroll)
+        try container.encodeIfPresent(buttons, forKey: .buttons)
+    }
+
     // Equatable
     static func == (a: Application, b: Application) -> Bool {
         return a.path == b.path
@@ -70,17 +97,17 @@ extension Application {
     }
     // 配置
     func getStep() -> Double {
-        return inherit ? Options.shared.scroll.step : scroll.step
+        return resolvedScrollOptions().step
     }
     func getSpeed() -> Double {
-        return inherit ? Options.shared.scroll.speed : scroll.speed
+        return resolvedScrollOptions().speed
     }
     func getDuration() -> Double {
-        return inherit ? Options.shared.scroll.durationTransition : scroll.durationTransition
+        return resolvedScrollOptions().durationTransition
     }
     // 功能
-    // inherit=on 时 resolvedScrollOptions() 即全局配置, 结果与全局路径一致;
-    // inherit=off 时完全使用应用自身配置, 不再受全局开关联动 (见 #1011)
+    // 未覆盖的设定项沿用全局配置, 结果与全局路径一致;
+    // 已覆盖的设定项完全使用应用自身配置, 不再受全局开关联动 (见 #1011)
     func isSmooth(_ block: Bool) -> Bool {
         if block { return false }
         return resolvedScrollOptions().smooth
@@ -113,7 +140,7 @@ extension Application {
 }
 
 private extension Application {
-    func resolvedScrollOptions() -> OPTIONS_SCROLL_DEFAULT {
-        return inherit ? Options.shared.scroll : scroll
+    func resolvedScrollOptions() -> ScrollValues {
+        return effectiveValues()
     }
 }

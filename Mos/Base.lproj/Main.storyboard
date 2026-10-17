@@ -1553,6 +1553,14 @@
                         </constraints>
                     </visualEffectView>
                     <connections>
+                        <outlet property="blockLabel" destination="kMQ-Oj-Bvd" id="eRq-XW-CZO"/>
+                        <outlet property="dashLabel" destination="mKO-0m-Vb0" id="mhA-MR-7OU"/>
+                        <outlet property="durationLabel" destination="z8H-6h-kRv" id="xze-J0-t5s"/>
+                        <outlet property="reverseLabel" destination="aV7-KP-bgw" id="vrf-yM-eyG"/>
+                        <outlet property="smoothLabel" destination="DQH-h2-1Zk" id="vSV-Pa-a1Y"/>
+                        <outlet property="speedLabel" destination="fAk-N9-naX" id="fNC-fz-4zN"/>
+                        <outlet property="stepLabel" destination="zKw-pT-YRj" id="24n-0w-zEu"/>
+                        <outlet property="toggleLabel" destination="9Nm-TC-llN" id="LC4-jh-NYn"/>
                         <outlet property="dashKeyBindButton" destination="EFO-dA-m6V" id="FB1-40-nl9"/>
                         <outlet property="dashKeyDelButton" destination="djY-Oz-zp6" id="OOJ-hd-KiK"/>
                         <outlet property="disableKeyBindButton" destination="tqn-BT-jaW" id="Ixz-Dg-J8J"/>

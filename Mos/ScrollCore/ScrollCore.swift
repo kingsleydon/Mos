@@ -33,6 +33,8 @@ class ScrollCore: ScrollActionPort {
     // 例外应用数据
     var application: Application?
     var currentApplication: Application? // 用于区分按下热键及抬起时的作用目标
+    // 例外设备数据
+    var device: ScrollDevice?
     // 拦截层
     var scrollEventInterceptor: Interceptor?
     var hotkeyEventInterceptor: Interceptor?
@@ -91,6 +93,8 @@ class ScrollCore: ScrollActionPort {
         let targetRunningApplication = ScrollUtils.shared.getRunningApplication(from: event)
         // 获取列表中应用程序的列外设置信息
         ScrollCore.shared.application = ScrollUtils.shared.getTargetApplication(from: targetRunningApplication)
+        // 获取列表中设备的例外设置信息
+        ScrollCore.shared.device = ScrollUtils.shared.getTargetDevice(from: event)
         // 平滑/翻转
         var enableSmooth = false,
             enableSmoothVertical = false,
@@ -100,22 +104,21 @@ class ScrollCore: ScrollActionPort {
         var step = Options.shared.scroll.step,
             speed = Options.shared.scroll.speed,
             duration = Options.shared.scroll.durationTransition
-        if let targetApplication = ScrollCore.shared.application {
-            enableSmooth = targetApplication.isSmooth(ScrollCore.shared.blockSmooth)
-            enableSmoothVertical = targetApplication.isSmoothVertical(ScrollCore.shared.blockSmooth)
-            enableSmoothHorizontal = targetApplication.isSmoothHorizontal(ScrollCore.shared.blockSmooth)
-            enableReverseVertical = targetApplication.isReverseVertical()
-            enableReverseHorizontal = targetApplication.isReverseHorizontal()
-            step = targetApplication.getStep()
-            speed = targetApplication.getSpeed()
-            duration = targetApplication.getDuration()
-        } else if !Options.shared.application.allowlist {
-            enableSmooth = Options.shared.scroll.smooth && !ScrollCore.shared.blockSmooth
-            enableSmoothVertical = enableSmooth && Options.shared.scroll.smoothVertical
-            enableSmoothHorizontal = enableSmooth && Options.shared.scroll.smoothHorizontal
-            let allowReverse = Options.shared.scroll.reverse
-            enableReverseVertical = allowReverse && Options.shared.scroll.reverseVertical
-            enableReverseHorizontal = allowReverse && Options.shared.scroll.reverseHorizontal
+        // 白名单模式下, 未列出的应用不做处理
+        if ScrollCore.shared.application != nil || !Options.shared.application.allowlist {
+            // 按设定项合并: 全局 → 例外应用 → 例外设备
+            let resolved = ScrollOptionsResolver.resolve(
+                application: ScrollCore.shared.application,
+                device: ScrollCore.shared.device
+            )
+            enableSmooth = resolved.smooth && !ScrollCore.shared.blockSmooth
+            enableSmoothVertical = enableSmooth && resolved.smoothVertical
+            enableSmoothHorizontal = enableSmooth && resolved.smoothHorizontal
+            enableReverseVertical = resolved.reverse && resolved.reverseVertical
+            enableReverseHorizontal = resolved.reverse && resolved.reverseHorizontal
+            step = resolved.step
+            speed = resolved.speed
+            duration = resolved.durationTransition
         }
         // Launchpad 激活则强制屏蔽平滑
         if ScrollUtils.shared.getLaunchpadActivity(withRunningApplication: targetRunningApplication) {

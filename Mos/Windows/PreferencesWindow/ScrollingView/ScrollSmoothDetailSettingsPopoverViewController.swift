@@ -7,6 +7,7 @@ class ScrollSmoothDetailSettingsPopoverViewController: AdaptivePopover, ScrollOp
     @IBOutlet weak var simulateTrackpadCheckBox: NSButton?
 
     var currentTargetApplication: Application?
+    var currentTargetDevice: ScrollDevice?
     var onOptionsChanged: (() -> Void)?
 
     override func viewDidLoad() {
@@ -25,33 +26,36 @@ class ScrollSmoothDetailSettingsPopoverViewController: AdaptivePopover, ScrollOp
     }
 
     @IBAction func verticalSmoothToggle(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().smoothVertical = sender.state == .on
+        updateScrollOptions([.smooth]) { $0.smoothVertical = sender.state == .on }
         syncViewWithOptions()
         onOptionsChanged?()
     }
 
     @IBAction func horizontalSmoothToggle(_ sender: NSButton) {
-        getTargetApplicationScrollOptions().smoothHorizontal = sender.state == .on
+        updateScrollOptions([.smooth]) { $0.smoothHorizontal = sender.state == .on }
         syncViewWithOptions()
         onOptionsChanged?()
     }
 
     @IBAction func simulateTrackpadToggle(_ sender: NSButton) {
-        let scrollOptions = getTargetApplicationScrollOptions()
         let isOn = sender.state == .on
-        let wasOn = scrollOptions.smoothSimTrackpad
-        scrollOptions.smoothSimTrackpad = isOn
-        if isOn {
-            if !wasOn {
-                scrollOptions.durationBeforeSimTrackpadLock = scrollOptions.duration
-            }
-            scrollOptions.duration = ScrollDurationLimits.simulateTrackpadDefault
-        } else {
-            if wasOn, let previous = scrollOptions.durationBeforeSimTrackpadLock {
-                scrollOptions.duration = previous
-            }
-            if wasOn {
-                scrollOptions.durationBeforeSimTrackpadLock = nil
+        // 模拟触控板会锁定过渡时长; 设备不支持覆盖过渡时, 只改平滑, 由解析层约束时长
+        let settings: Set<ScrollSetting> = isSettingEditable(.duration) ? [.smooth, .duration] : [.smooth]
+        updateScrollOptions(settings) { scrollOptions in
+            let wasOn = scrollOptions.smoothSimTrackpad
+            scrollOptions.smoothSimTrackpad = isOn
+            if isOn {
+                if !wasOn {
+                    scrollOptions.durationBeforeSimTrackpadLock = scrollOptions.duration
+                }
+                scrollOptions.duration = ScrollDurationLimits.simulateTrackpadDefault
+            } else {
+                if wasOn, let previous = scrollOptions.durationBeforeSimTrackpadLock {
+                    scrollOptions.duration = previous
+                }
+                if wasOn {
+                    scrollOptions.durationBeforeSimTrackpadLock = nil
+                }
             }
         }
         syncViewWithOptions()

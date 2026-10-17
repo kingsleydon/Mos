@@ -176,6 +176,45 @@ class OPTIONS_SCROLL_DEFAULT: Codable {
     var durationBeforeSimTrackpadLock: Double? {
         didSet {Options.shared.markChanged(scrollContainer: self)}
     }
+    init() {}
+    // 从值快照构造 (designated init 内赋值不触发 didSet, 用于只读的合并结果展示)
+    init(values: ScrollValues) {
+        smooth = values.smooth
+        reverse = values.reverse
+        reverseVertical = values.reverseVertical
+        reverseHorizontal = values.reverseHorizontal
+        dash = values.dash
+        toggle = values.toggle
+        block = values.block
+        step = values.step
+        speed = values.speed
+        duration = values.duration
+        deadZone = values.deadZone
+        smoothSimTrackpad = values.smoothSimTrackpad
+        smoothVertical = values.smoothVertical
+        smoothHorizontal = values.smoothHorizontal
+        durationBeforeSimTrackpadLock = values.durationBeforeSimTrackpadLock
+    }
+    // 值快照 (滚动热路径使用, 避免引用共享)
+    var values: ScrollValues {
+        return ScrollValues(
+            smooth: smooth,
+            reverse: reverse,
+            reverseVertical: reverseVertical,
+            reverseHorizontal: reverseHorizontal,
+            dash: dash,
+            toggle: toggle,
+            block: block,
+            step: step,
+            speed: speed,
+            duration: duration,
+            deadZone: deadZone,
+            smoothSimTrackpad: smoothSimTrackpad,
+            smoothVertical: smoothVertical,
+            smoothHorizontal: smoothHorizontal,
+            durationBeforeSimTrackpadLock: durationBeforeSimTrackpadLock
+        )
+    }
     // 工具
     static func generateDurationTransition(with duration: Double) -> Double {
         // 上界, 此处需要与界面的 Slider 上界保持同步, 并添加 0.2 的偏移令结果不为 0
@@ -216,6 +255,14 @@ class OPTIONS_APPLICATION_DEFAULT {
     var applications = EnhanceArray<Application>(
         matchKey: "path",
         forObserver: {() in Options.shared.markChanged(.application)}
+    )
+}
+
+// 例外设备
+class OPTIONS_DEVICE_DEFAULT {
+    var devices = EnhanceArray<ScrollDevice>(
+        matchKey: "identity",
+        forObserver: {() in Options.shared.markChanged(.device)}
     )
 }
 

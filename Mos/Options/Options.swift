@@ -46,11 +46,15 @@ struct OptionItem {
         static let Allowlist = "allowlist"
         static let Applications = "applications"
     }
+
+    struct Device {
+        static let Devices = "devices"
+    }
 }
 
 /// 配置分组: 变更通知与脏组写入的粒度
 enum OptionsGroup: CaseIterable {
-    case general, update, scroll, buttons, application
+    case general, update, scroll, buttons, application, device
 }
 
 class Options {
@@ -84,6 +88,10 @@ class Options {
     // 应用
     var application = OPTIONS_APPLICATION_DEFAULT() {
         didSet { markChanged(.application) }
+    }
+    // 设备
+    var device = OPTIONS_DEVICE_DEFAULT() {
+        didSet { markChanged(.device) }
     }
 
     /// 保留无法 decode 的 binding 原始 JSON 元素 (来自未来 Mos 版本).
@@ -129,9 +137,22 @@ extension Options {
         scheduleSaveFlush()
     }
 
-    /// 身份路由: scroll 容器被全局配置与 per-app (Application.scroll) 复用
+    /// 身份路由: scroll 容器被全局配置, per-app (Application.scroll) 与 per-device (ScrollDevice.scroll) 复用
     func markChanged(scrollContainer: OPTIONS_SCROLL_DEFAULT) {
-        markChanged(scrollContainer === scroll ? .scroll : .application)
+        if scrollContainer === scroll {
+            markChanged(.scroll)
+        } else if isDeviceScrollContainer(scrollContainer) {
+            markChanged(.device)
+        } else {
+            markChanged(.application)
+        }
+    }
+    private func isDeviceScrollContainer(_ container: OPTIONS_SCROLL_DEFAULT) -> Bool {
+        let devices = device.devices
+        for index in 0..<devices.count where devices.get(by: index)?.scroll === container {
+            return true
+        }
+        return false
     }
     /// 身份路由: buttons 容器被全局配置与 per-app (Application.buttons) 复用
     func markChanged(buttonsContainer: OPTIONS_BUTTONS_DEFAULT) {
@@ -231,6 +252,8 @@ extension Options {
         // 应用
         application.allowlist = UserDefaults.standard.bool(forKey: OptionItem.Application.Allowlist)
         application.applications = loadApplicationsData()
+        // 设备
+        device.devices = loadDevicesData()
         // 解锁
         readingOptionsLock = false
     }
@@ -277,6 +300,12 @@ extension Options {
                 UserDefaults.standard.set(applicationsData, forKey: OptionItem.Application.Applications)
             } else {
                 NSLog("Failed to serialize applications data, skipping save")
+            }
+        case .device:
+            if let devicesData = device.devices.json() {
+                UserDefaults.standard.set(devicesData, forKey: OptionItem.Device.Devices)
+            } else {
+                NSLog("Failed to serialize devices data, skipping save")
             }
         }
     }
@@ -424,6 +453,33 @@ extension Options {
         } catch {
             NSLog("Failed to decode applications data: \(error), resetting to defaults")
             UserDefaults.standard.removeObject(forKey: OptionItem.Application.Applications)
+            return defaultArray
+        }
+    }
+
+    // 安全加载设备列表数据
+    private func loadDevicesData() -> EnhanceArray<ScrollDevice> {
+        let defaultArray = EnhanceArray<ScrollDevice>(
+            matchKey: "identity",
+            forObserver: { Options.shared.markChanged(.device) }
+        )
+        let rawValue = UserDefaults.standard.object(forKey: OptionItem.Device.Devices)
+        guard let data = rawValue as? Data else {
+            if rawValue != nil {
+                NSLog("Devices data has wrong type: \(type(of: rawValue)), clearing corrupted data")
+                UserDefaults.standard.removeObject(forKey: OptionItem.Device.Devices)
+            }
+            return defaultArray
+        }
+        do {
+            return try EnhanceArray<ScrollDevice>(
+                withData: data,
+                matchKey: "identity",
+                forObserver: { Options.shared.markChanged(.device) }
+            )
+        } catch {
+            NSLog("Failed to decode devices data: \(error), resetting to defaults")
+            UserDefaults.standard.removeObject(forKey: OptionItem.Device.Devices)
             return defaultArray
         }
     }

@@ -23,6 +23,17 @@ final class OptionsChangePropagationTests: XCTestCase {
         XCTAssertEqual(received, [.scroll, .application])
     }
 
+    /// scroll 容器身份路由: 例外设备的 scroll → .device
+    func testDeviceScrollContainerIdentityRouting() {
+        let options = Options()
+        let device = ScrollDevice(vendorID: 1, productID: 2, name: "Test Mouse")
+        options.device.devices.append(device)
+        var received: [OptionsGroup] = []
+        options.observe([.scroll, .application, .device]) { received.append($0) }
+        options.markChanged(scrollContainer: device.scroll)
+        XCTAssertEqual(received, [.device])
+    }
+
     /// buttons 容器身份路由
     func testButtonsContainerIdentityRouting() {
         let options = Options()
