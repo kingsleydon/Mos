@@ -195,6 +195,24 @@ class OPTIONS_SCROLL_DEFAULT: Codable {
         smoothHorizontal = values.smoothHorizontal
         durationBeforeSimTrackpadLock = values.durationBeforeSimTrackpadLock
     }
+    // 写入值快照; 只赋值变化的字段, 避免无意义的变更通知
+    func apply(_ values: ScrollValues) {
+        if smooth != values.smooth { smooth = values.smooth }
+        if reverse != values.reverse { reverse = values.reverse }
+        if reverseVertical != values.reverseVertical { reverseVertical = values.reverseVertical }
+        if reverseHorizontal != values.reverseHorizontal { reverseHorizontal = values.reverseHorizontal }
+        if dash != values.dash { dash = values.dash }
+        if toggle != values.toggle { toggle = values.toggle }
+        if block != values.block { block = values.block }
+        if step != values.step { step = values.step }
+        if speed != values.speed { speed = values.speed }
+        if duration != values.duration { duration = values.duration }
+        if deadZone != values.deadZone { deadZone = values.deadZone }
+        if smoothSimTrackpad != values.smoothSimTrackpad { smoothSimTrackpad = values.smoothSimTrackpad }
+        if smoothVertical != values.smoothVertical { smoothVertical = values.smoothVertical }
+        if smoothHorizontal != values.smoothHorizontal { smoothHorizontal = values.smoothHorizontal }
+        if durationBeforeSimTrackpadLock != values.durationBeforeSimTrackpadLock { durationBeforeSimTrackpadLock = values.durationBeforeSimTrackpadLock }
+    }
     // 值快照 (滚动热路径使用, 避免引用共享)
     var values: ScrollValues {
         return ScrollValues(

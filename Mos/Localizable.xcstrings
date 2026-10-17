@@ -16700,6 +16700,101 @@
           }
         }
       }
+    },
+    "overridesDeviceAllowlistHint": {
+      "comment": "Help popover text for the allow list mode of the device list",
+      "localizations": {
+        "cs": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "許可リストモードでは、Mos はデバイスリストでチェックされたマウスのみを処理します。キーボードには影響しません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "The allow list mode will make Mos only handle the mice checked in the device list. Keyboards are not affected."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "白名单模式下，Mos 仅处理设备列表中已勾选的鼠标，键盘不受影响。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "白名單模式下，Mos 僅處理裝置列表中已勾選的滑鼠，鍵盤不受影響。"
+          }
+        },
+        "zh-Hant-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "白名單模式下，Mos 僅處理裝置列表中已勾選的滑鼠，鍵盤不受影響。"
+          }
+        },
+        "zh-Hant-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "白名單模式下，Mos 僅處理裝置列表中已勾選的滑鼠，鍵盤不受影響。"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

@@ -889,7 +889,6 @@
                     </visualEffectView>
                     <connections>
                         <outlet property="addButton" destination="ceK-ED-PfL" id="6o3-ow-6Jm"/>
-                        <outlet property="allowlistHelpButton" destination="8FH-Zr-4mB" id="KWh-9T-5FY"/>
                         <outlet property="createButtonDescription" destination="V2s-M6-mOE" id="J7N-nP-av4"/>
                         <outlet property="createButtonTitle" destination="MPG-5z-OT3" id="hvI-BL-Z4h"/>
                         <outlet property="tableEmptyDescription" destination="OKC-Nf-egM" id="QIW-Ml-MAc"/>

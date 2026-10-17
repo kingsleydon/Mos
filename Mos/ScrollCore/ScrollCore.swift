@@ -79,12 +79,7 @@ class ScrollCore: ScrollActionPort {
         ScrollCore.shared.application = ScrollUtils.shared.getTargetApplication(from: targetRunningApplication)
         ScrollCore.shared.device = isTrackpad ? nil : ScrollUtils.shared.getTargetDevice(from: event)
         // 已停用的应用/设备, 以及白名单模式下未列出的应用/设备: 完全不处理
-        if !isTrackpad && !ScrollOptionsResolver.isActive(
-            application: ScrollCore.shared.application,
-            device: ScrollCore.shared.device,
-            applicationAllowlist: Options.shared.application.allowlist,
-            deviceAllowlist: Options.shared.device.allowlist
-        ) {
+        if !isTrackpad && !ScrollOptionsResolver.isActive(application: ScrollCore.shared.application, device: ScrollCore.shared.device) {
             return Unmanaged.passUnretained(event)
         }
         let hasVerticalDelta = scrollEvent.Y.valid && scrollEvent.Y.usableValue != 0.0

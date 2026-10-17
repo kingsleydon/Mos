@@ -469,7 +469,7 @@ extension PreferencesScrollingViewController {
         }
     }
 
-    /// 是否与默认配置不同 (覆盖层上下文只比较可覆盖的设定项)
+    /// 全局配置是否与默认配置不同
     private func differsFromDefaults() -> Bool {
         return Options.shared.scroll.values != DefaultConfigForCompare.values
     }

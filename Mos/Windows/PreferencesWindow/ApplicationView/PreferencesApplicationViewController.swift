@@ -20,7 +20,6 @@ class PreferencesApplicationViewController: NSViewController {
     // MARK: - UI Elements
     // 白名单
     @IBOutlet weak var allowlistModeCheckBox: NSButton!
-    @IBOutlet weak var allowlistHelpButton: NSButton?
     // 表格
     @IBOutlet weak var tableHead: NSVisualEffectView!
     @IBOutlet weak var tableHeadTitle: NSTextField?
@@ -132,6 +131,17 @@ class PreferencesApplicationViewController: NSViewController {
         updateDelButtonState()
     }
 
+    // 白名单说明弹窗
+    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        guard mode == .devices,
+              let hint = segue.destinationController as? NSViewController,
+              let label = hint.view.subviews.compactMap({ $0 as? NSTextField }).first else {
+            return
+        }
+        label.stringValue = NSLocalizedString("overridesDeviceAllowlistHint", comment: "Help popover text for the allow list mode of the device list")
+    }
+
     private func openSourceMenu(_ targetView: NSView, _ targetPosition: NSPoint) {
         switch mode {
         case .applications:
@@ -189,15 +199,17 @@ extension PreferencesApplicationViewController {
             tableEmptyDescription?.stringValue = NSLocalizedString("overridesNoDeviceDescription", comment: "Empty state description of the per-device overrides list")
             createButtonTitle?.stringValue = NSLocalizedString("overridesAddDevice", comment: "Primary button title to add a per-device override")
             createButtonDescription?.stringValue = NSLocalizedString("overridesAddDeviceDescription", comment: "Primary button description to add a per-device override")
-            if let image = PreferencesApplicationViewController.deviceIcon() {
+            if let image = PreferencesApplicationViewController.deviceIcon(pointSize: 44) {
                 tableEmptyImage?.image = image
             }
         }
     }
 
-    static func deviceIcon() -> NSImage? {
+    static func deviceIcon(pointSize: CGFloat? = nil) -> NSImage? {
         if #available(macOS 11.0, *) {
-            return NSImage(systemSymbolName: "computermouse", accessibilityDescription: nil)
+            let image = NSImage(systemSymbolName: "computermouse", accessibilityDescription: nil)
+            guard let pointSize = pointSize else { return image }
+            return image?.withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: pointSize, weight: .ultraLight))
         }
         return NSImage(named: NSImage.computerName)
     }
@@ -213,7 +225,6 @@ extension PreferencesApplicationViewController {
         let allowlist = mode == .applications ? Options.shared.application.allowlist : Options.shared.device.allowlist
         allowlistModeCheckBox.state = NSControl.StateValue(rawValue: allowlist ? 1 : 0)
         allowlistModeCheckBox.toolTip = mode == .applications ? nil : NSLocalizedString("overridesDeviceAllowlistTooltip", comment: "Tooltip of the allow list checkbox in the device list")
-        allowlistHelpButton?.isHidden = mode != .applications
         updateModeTexts()
     }
 

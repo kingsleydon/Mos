@@ -66,30 +66,9 @@ enum ScrollSetting: String, CaseIterable, Codable {
 
     /// 把 source 中属于本设定项的字段写入 target 容器 (触发持久化)
     func copy(from source: ScrollValues, to target: OPTIONS_SCROLL_DEFAULT) {
-        switch self {
-        case .smooth:
-            target.smooth = source.smooth
-            target.smoothVertical = source.smoothVertical
-            target.smoothHorizontal = source.smoothHorizontal
-            target.smoothSimTrackpad = source.smoothSimTrackpad
-            target.durationBeforeSimTrackpadLock = source.durationBeforeSimTrackpadLock
-        case .reverse:
-            target.reverse = source.reverse
-            target.reverseVertical = source.reverseVertical
-            target.reverseHorizontal = source.reverseHorizontal
-        case .dash:
-            target.dash = source.dash
-        case .toggle:
-            target.toggle = source.toggle
-        case .block:
-            target.block = source.block
-        case .step:
-            target.step = source.step
-        case .speed:
-            target.speed = source.speed
-        case .duration:
-            target.duration = source.duration
-        }
+        var values = target.values
+        merge(from: source, into: &values)
+        target.apply(values)
     }
 }
 
@@ -149,6 +128,15 @@ enum ScrollOptionsResolver {
         let applicationActive = application.map { !$0.disabled } ?? !applicationAllowlist
         let deviceActive = device.map { !$0.disabled } ?? !deviceAllowlist
         return applicationActive && deviceActive
+    }
+
+    static func isActive(application: Application?, device: ScrollDevice?) -> Bool {
+        return isActive(
+            application: application,
+            device: device,
+            applicationAllowlist: Options.shared.application.allowlist,
+            deviceAllowlist: Options.shared.device.allowlist
+        )
     }
 
     static func resolve(application: Application?, device: ScrollDevice?) -> ScrollValues {
