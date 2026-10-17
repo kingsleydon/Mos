@@ -343,12 +343,12 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
                     guard let application = Options.shared.application.applications.get(by: row) else { return nil }
                     cell.imageView?.image = application.getIcon()
                     cell.imageView?.toolTip = application.path
-                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(application.getName(), summary: application.overrideSummary(), disabled: application.disabled)
+                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(application.getName(), summary: PreferencesApplicationViewController.overrideSummary(for: application), disabled: application.disabled)
                 case .devices:
                     guard let device = Options.shared.device.devices.get(by: row) else { return nil }
                     cell.imageView?.image = PreferencesApplicationViewController.deviceIcon()
                     cell.imageView?.toolTip = device.identity
-                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(device.getName(), summary: device.overrideSummary(), disabled: device.disabled)
+                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(device.getName(), summary: PreferencesApplicationViewController.overrideSummary(for: device), disabled: device.disabled)
                 }
                 return cell
             // 设定: 滚动
@@ -538,5 +538,71 @@ extension PreferencesApplicationViewController: NSMenuDelegate {
         Options.shared.device.devices.append(ScrollDevice(info: info))
         tableView.reloadData()
         toggleNoDataHint()
+    }
+}
+
+/**
+ * 覆盖摘要: 列出与全局不同的设定项及其取值, 如 "Smooth: Off, Speed: 5.00"
+ **/
+extension PreferencesApplicationViewController {
+
+    static func overrideSummary(for profile: ScrollProfile) -> String {
+        let differing = profile.differingSettings()
+        if differing.isEmpty {
+            return NSLocalizedString("overridesSummaryNone", comment: "Summary for an override entry that inherits every setting")
+        }
+        let values = profile.effectiveValues()
+        let global = ScrollOptionsResolver.resolve(global: Options.shared.scroll, layers: [])
+        let format = NSLocalizedString("overridesSummaryItemFormat", comment: "One item in the override summary: setting name, then its value, e.g. \"Smooth: Off\"")
+        let separator = NSLocalizedString("overridesSummarySeparator", comment: "Separator between setting names in the override summary")
+        return ScrollSetting.allCases.filter { differing.contains($0) }.map { setting in
+            String(format: format, name(of: setting), value(of: setting, in: values, global: global))
+        }.joined(separator: separator)
+    }
+
+    private static func name(of setting: ScrollSetting) -> String {
+        switch setting {
+        case .smooth: return NSLocalizedString("scrollSettingNameSmooth", comment: "Short name of the smooth scrolling setting")
+        case .reverse: return NSLocalizedString("scrollSettingNameReverse", comment: "Short name of the reverse scrolling setting")
+        case .dash: return NSLocalizedString("scrollSettingNameDash", comment: "Short name of the dash key setting")
+        case .toggle: return NSLocalizedString("scrollSettingNameToggle", comment: "Short name of the toggle key setting")
+        case .block: return NSLocalizedString("scrollSettingNameBlock", comment: "Short name of the block key setting")
+        case .step: return NSLocalizedString("scrollSettingNameStep", comment: "Short name of the scroll step setting")
+        case .speed: return NSLocalizedString("scrollSettingNameSpeed", comment: "Short name of the scroll speed setting")
+        case .duration: return NSLocalizedString("scrollSettingNameDuration", comment: "Short name of the scroll duration setting")
+        }
+    }
+
+    private static func value(of setting: ScrollSetting, in values: ScrollValues, global: ScrollValues) -> String {
+        switch setting {
+        case .smooth:
+            // 总开关相同时, 差异在细节 (轴向 / 模拟触控板) 中
+            return values.smooth == global.smooth ? customValue : onOff(values.smooth)
+        case .reverse:
+            return values.reverse == global.reverse ? customValue : onOff(values.reverse)
+        case .dash: return hotkeyName(values.dash)
+        case .toggle: return hotkeyName(values.toggle)
+        case .block: return hotkeyName(values.block)
+        case .step: return String(format: "%.2f", values.step)
+        case .speed: return String(format: "%.2f", values.speed)
+        case .duration: return String(format: "%.2f", values.duration)
+        }
+    }
+
+    private static func onOff(_ isOn: Bool) -> String {
+        return isOn
+            ? NSLocalizedString("overridesSummaryValueOn", comment: "Value 'on' in the override summary")
+            : NSLocalizedString("overridesSummaryValueOff", comment: "Value 'off' in the override summary")
+    }
+
+    private static var customValue: String {
+        return NSLocalizedString("overridesSummaryValueCustom", comment: "Value in the override summary when only detail options (axes etc.) differ")
+    }
+
+    private static func hotkeyName(_ hotkey: ScrollHotkey?) -> String {
+        guard let hotkey = hotkey else {
+            return NSLocalizedString("Disabled", comment: "Hotkey disabled state")
+        }
+        return PreferencesScrollingViewController.getFullDisplayName(for: hotkey)
     }
 }

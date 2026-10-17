@@ -313,7 +313,7 @@ extension PreferencesScrollingViewController {
 
     /// 获取 ScrollHotkey 的完整显示名称
     /// 获取按键基础名称 (不含品牌前缀)
-    private func getBaseDisplayName(for hotkey: ScrollHotkey) -> String {
+    static func getBaseDisplayName(for hotkey: ScrollHotkey) -> String {
         switch hotkey.type {
         case .keyboard:
             if let fullName = PreferencesScrollingViewController.keyFullNames[hotkey.code] {
@@ -329,8 +329,8 @@ extension PreferencesScrollingViewController {
     }
 
     /// 获取完整显示名称 (含品牌前缀, 用于纯文本场景)
-    private func getFullDisplayName(for hotkey: ScrollHotkey) -> String {
-        let baseName = getBaseDisplayName(for: hotkey)
+    static func getFullDisplayName(for hotkey: ScrollHotkey) -> String {
+        let baseName = PreferencesScrollingViewController.getBaseDisplayName(for: hotkey)
         if let brand = BrandTag.brandForCode(hotkey.code) {
             return BrandTag.prefixedName(baseName, brand: brand)
         }
@@ -345,7 +345,7 @@ extension PreferencesScrollingViewController {
 
         // 设置按钮标题
         if let hotkey = hotkey {
-            let baseName = getBaseDisplayName(for: hotkey)
+            let baseName = PreferencesScrollingViewController.getBaseDisplayName(for: hotkey)
             if let brand = BrandTag.brandForCode(hotkey.code) {
                 // 品牌按键: image=tag, title=名称, 左图右文
                 button.image = BrandTag.createTagImage(brand: brand, fontSize: 7, height: 14, padH: 5, marginRight: 4)
@@ -354,7 +354,7 @@ extension PreferencesScrollingViewController {
             } else {
                 button.image = nil
                 button.imagePosition = .noImage
-                button.title = getFullDisplayName(for: hotkey)
+                button.title = PreferencesScrollingViewController.getFullDisplayName(for: hotkey)
             }
         } else {
             button.image = nil

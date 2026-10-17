@@ -192,33 +192,3 @@ enum ScrollOptionsResolver {
         return resolve(global: Options.shared.scroll, layers: [application, device])
     }
 }
-
-extension ScrollSetting {
-    var localizedName: String {
-        switch self {
-        case .smooth: return NSLocalizedString("scrollSettingNameSmooth", comment: "Short name of the smooth scrolling setting")
-        case .reverse: return NSLocalizedString("scrollSettingNameReverse", comment: "Short name of the reverse scrolling setting")
-        case .dash: return NSLocalizedString("scrollSettingNameDash", comment: "Short name of the dash key setting")
-        case .toggle: return NSLocalizedString("scrollSettingNameToggle", comment: "Short name of the toggle key setting")
-        case .block: return NSLocalizedString("scrollSettingNameBlock", comment: "Short name of the block key setting")
-        case .step: return NSLocalizedString("scrollSettingNameStep", comment: "Short name of the scroll step setting")
-        case .speed: return NSLocalizedString("scrollSettingNameSpeed", comment: "Short name of the scroll speed setting")
-        case .duration: return NSLocalizedString("scrollSettingNameDuration", comment: "Short name of the scroll duration setting")
-        }
-    }
-}
-
-extension ScrollProfile {
-    /// 列表中展示的覆盖摘要
-    func overrideSummary() -> String {
-        let differing = differingSettings()
-        if differing.isEmpty {
-            return NSLocalizedString("overridesSummaryNone", comment: "Summary for an override entry that inherits every setting")
-        }
-        if supportedSettings.isSubset(of: differing) {
-            return NSLocalizedString("overridesSummaryAll", comment: "Summary for an override entry that overrides every setting")
-        }
-        let separator = NSLocalizedString("overridesSummarySeparator", comment: "Separator between setting names in the override summary")
-        return ScrollSetting.allCases.filter { differing.contains($0) }.map { $0.localizedName }.joined(separator: separator)
-    }
-}
