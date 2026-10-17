@@ -433,8 +433,9 @@ extension PreferencesScrollingViewController {
         }
         let note = NSTextField(labelWithString: NSLocalizedString("deviceHotkeysFollowGlobalNote", comment: "Note in the device settings popover explaining that dash/toggle/block keys cannot be set per device"))
         note.identifier = PreferencesScrollingViewController.deviceHotkeyNoteIdentifier
-        note.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-        note.textColor = NSColor.secondaryLabelColor
+        // 与各行说明文字同样式
+        note.font = anchor.font
+        note.textColor = anchor.textColor
         note.lineBreakMode = .byWordWrapping
         note.preferredMaxLayoutWidth = 240
         note.translatesAutoresizingMaskIntoConstraints = false
