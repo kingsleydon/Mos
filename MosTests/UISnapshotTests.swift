@@ -118,7 +118,9 @@ final class UISnapshotTests: XCTestCase {
 
     private func snapshot(_ controller: NSViewController, name: String) {
         let window = NSWindow(contentViewController: controller)
-        window.appearance = NSAppearance(named: .darkAqua)
+        if #available(macOS 10.14, *) {
+            window.appearance = NSAppearance(named: .darkAqua)
+        }
         window.setFrameOrigin(NSPoint(x: -10000, y: -10000))
         window.orderFrontRegardless()
         windows.append(window)
