@@ -23,10 +23,9 @@ jobs:
 
       - name: Build
         run: |
-          xcodebuild -scheme Debug -configuration Release \
+          xcodebuild -scheme Profile -configuration Release \
             -destination 'generic/platform=macOS' \
             -derivedDataPath build/DerivedData \
-            -enableCodeCoverage NO \
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS=MOS_FORK_BUILD \
             MARKETING_VERSION="${VERSION#v}" \
