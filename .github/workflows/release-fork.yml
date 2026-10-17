@@ -26,6 +26,7 @@ jobs:
           xcodebuild -scheme Debug -configuration Release \
             -destination 'generic/platform=macOS' \
             -derivedDataPath build/DerivedData \
+            -enableCodeCoverage NO \
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS=MOS_FORK_BUILD \
             MARKETING_VERSION="${VERSION#v}" \
@@ -40,6 +41,8 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :SUEnableAutomaticChecks bool false" "$APP/Contents/Info.plist"
           codesign --force --deep --sign - "$APP"
           codesign --verify --deep --strict --verbose=2 "$APP"
+          # 发布构建不得包含覆盖率插桩
+          if otool -l "$APP/Contents/MacOS/Mos" | grep -q __llvm_prf; then echo "coverage instrumentation found" >&2; exit 1; fi
           /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist"
 
       - name: Package
