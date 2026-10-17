@@ -543,7 +543,7 @@
         <scene sceneID="UqT-28-MT6">
             <objects>
                 <customObject id="l11-a0-4Xa" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <viewController title="Application" storyboardIdentifier="application" id="bga-wG-iim" customClass="PreferencesApplicationViewController" customModule="Mos" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Overrides" storyboardIdentifier="application" id="bga-wG-iim" customClass="PreferencesApplicationViewController" customModule="Mos" customModuleProvider="target" sceneMemberID="viewController">
                     <visualEffectView key="view" wantsLayer="YES" blendingMode="behindWindow" material="toolTip" state="followsWindowActiveState" id="jc3-9p-Bfo">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="321"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -872,10 +872,10 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="2dP-HG-cdi" secondAttribute="trailing" id="6gh-ZQ-gJJ"/>
-                            <constraint firstItem="VAL-LC-T3T" firstAttribute="top" secondItem="jc3-9p-Bfo" secondAttribute="top" id="9QK-kP-Jub"/>
+                            <constraint firstItem="VAL-LC-T3T" firstAttribute="top" secondItem="jc3-9p-Bfo" secondAttribute="top" constant="40" id="9QK-kP-Jub"/>
                             <constraint firstAttribute="trailing" secondItem="2yz-Bt-IMN" secondAttribute="trailing" id="Fm8-bP-i1Z"/>
                             <constraint firstItem="LTZ-IH-4Vy" firstAttribute="centerX" secondItem="jc3-9p-Bfo" secondAttribute="centerX" id="Fu9-Mt-We0"/>
-                            <constraint firstItem="LTZ-IH-4Vy" firstAttribute="top" secondItem="jc3-9p-Bfo" secondAttribute="top" constant="40" id="PE0-jE-Dbl"/>
+                            <constraint firstItem="LTZ-IH-4Vy" firstAttribute="top" secondItem="jc3-9p-Bfo" secondAttribute="top" constant="80" id="PE0-jE-Dbl"/>
                             <constraint firstItem="2dP-HG-cdi" firstAttribute="leading" secondItem="jc3-9p-Bfo" secondAttribute="leading" id="PmN-uQ-mSV"/>
                             <constraint firstAttribute="bottom" secondItem="2yz-Bt-IMN" secondAttribute="bottom" id="SIB-8x-LBj"/>
                             <constraint firstAttribute="bottom" secondItem="lhT-1U-5Xh" secondAttribute="bottom" constant="38" id="UI1-Tn-4WQ"/>
@@ -889,6 +889,13 @@
                     </visualEffectView>
                     <connections>
                         <outlet property="addButton" destination="ceK-ED-PfL" id="6o3-ow-6Jm"/>
+                        <outlet property="allowlistHelpButton" destination="8FH-Zr-4mB" id="KWh-9T-5FY"/>
+                        <outlet property="createButtonDescription" destination="V2s-M6-mOE" id="J7N-nP-av4"/>
+                        <outlet property="createButtonTitle" destination="MPG-5z-OT3" id="hvI-BL-Z4h"/>
+                        <outlet property="tableEmptyDescription" destination="OKC-Nf-egM" id="QIW-Ml-MAc"/>
+                        <outlet property="tableEmptyImage" destination="D09-cG-tQf" id="5Os-XC-dhX"/>
+                        <outlet property="tableEmptyTitle" destination="JG0-5p-fCy" id="ukv-xI-Qjp"/>
+                        <outlet property="tableHeadTitle" destination="Dph-wy-8sb" id="cSS-lO-bOg"/>
                         <outlet property="allowlistModeCheckBox" destination="gnb-pe-ZN5" id="HTP-3G-Zme"/>
                         <outlet property="applicationSourceMenuControl" destination="v6G-mQ-Ddk" id="dfx-xG-DcT"/>
                         <outlet property="createButton" destination="lhT-1U-5Xh" id="mGX-gX-oxZ"/>

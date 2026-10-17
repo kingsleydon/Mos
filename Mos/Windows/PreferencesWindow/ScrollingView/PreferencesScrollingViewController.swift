@@ -59,9 +59,6 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     // 覆盖层上下文: 每行的 "恢复为全局设定" 按钮
     private var inheritButtons: [ScrollSetting: NSButton] = [:]
     private var inheritButtonOffsets: [ScrollSetting: NSLayoutConstraint] = [:]
-    // 全局上下文: 例外设备入口
-    private var devicePopUpButton: NSPopUpButton?
-    private var deviceMenuInfos: [String: PointingDeviceInfo] = [:]
 
     override func viewDidLoad() {
         // 禁止自动 Focus
@@ -74,9 +71,8 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
         scrollDurationDescriptionDefaultText = scrollDurationDescriptionLabel?.stringValue
         // 设置 KeyRecorder 代理
         keyRecorder.delegate = self
-        // 覆盖层上下文: 按设定项继承; 全局上下文: 例外设备入口
+        // 覆盖层上下文: 按设定项继承
         setupInheritButtons()
-        setupDeviceOverrideRow()
         // 读取设置
         syncViewWithOptions()
     }
@@ -479,109 +475,5 @@ extension PreferencesScrollingViewController {
             setting.merge(from: current, into: &comparable)
         }
         return comparable != defaults
-    }
-}
-
-// MARK: - 例外设备
-extension PreferencesScrollingViewController: NSMenuDelegate {
-
-    /// 全局上下文中, 在过渡设置与重置按钮之间插入 "设备" 行
-    private func setupDeviceOverrideRow() {
-        guard currentScrollProfile == nil,
-              let rowLabelAnchor = durationLabel,
-              let descriptionAnchor = scrollDurationDescriptionLabel,
-              let resetTopConstraint = view.constraints.first(where: {
-                  $0.firstItem === resetToDefaultsButton && $0.firstAttribute == .top && $0.secondItem === descriptionAnchor
-              }) else {
-            return
-        }
-        let smallFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-        // 标题
-        let label = NSTextField(labelWithString: NSLocalizedString("scrollDevicesTitle", comment: "Title of the per-device scroll settings row"))
-        label.font = smallFont
-        label.textColor = NSColor.secondaryLabelColor
-        label.alignment = .right
-        // 设备菜单
-        let popUp = NSPopUpButton(frame: .zero, pullsDown: true)
-        popUp.controlSize = .small
-        popUp.font = smallFont
-        popUp.addItem(withTitle: NSLocalizedString("scrollDevicesConfigure", comment: "Title of the pull-down menu listing mice for per-device scroll settings"))
-        popUp.menu?.delegate = self
-        // 说明
-        let description = NSTextField(labelWithString: NSLocalizedString("scrollDevicesDescription", comment: "Description of the per-device scroll settings row"))
-        description.font = smallFont
-        description.lineBreakMode = .byTruncatingTail
-        description.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        description.textColor = NSColor.secondaryLabelColor
-        for subview in [label, popUp, description] as [NSView] {
-            subview.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(subview)
-        }
-        resetTopConstraint.isActive = false
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: rowLabelAnchor.leadingAnchor),
-            label.trailingAnchor.constraint(equalTo: rowLabelAnchor.trailingAnchor),
-            label.centerYAnchor.constraint(equalTo: popUp.centerYAnchor),
-            popUp.topAnchor.constraint(equalTo: descriptionAnchor.bottomAnchor, constant: 16),
-            popUp.leadingAnchor.constraint(equalTo: scrollDurationSlider.leadingAnchor, constant: -2),
-            popUp.widthAnchor.constraint(greaterThanOrEqualToConstant: 160),
-            description.topAnchor.constraint(equalTo: popUp.bottomAnchor, constant: 6),
-            description.leadingAnchor.constraint(equalTo: scrollDurationSlider.leadingAnchor),
-            description.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            resetToDefaultsButton.topAnchor.constraint(equalTo: description.bottomAnchor, constant: 20),
-        ])
-        devicePopUpButton = popUp
-    }
-
-    func menuNeedsUpdate(_ menu: NSMenu) {
-        guard menu === devicePopUpButton?.menu else { return }
-        // 下拉菜单的第一项是按钮标题
-        while menu.items.count > 1 {
-            menu.removeItem(at: 1)
-        }
-        deviceMenuInfos = [:]
-        // 已连接的鼠标 (最近滚动过的排在最前), 其后是已配置但未连接的设备
-        var infos = PointingDeviceRegistry.shared.connectedMice()
-        if let last = PointingDeviceRegistry.shared.lastScrollDevice {
-            infos.removeAll { $0.identity == last.identity }
-            infos.insert(last, at: 0)
-        }
-        let devices = Options.shared.device.devices
-        for index in 0..<devices.count {
-            guard let device = devices.get(by: index), !infos.contains(where: { $0.identity == device.identity }) else { continue }
-            infos.append(PointingDeviceInfo(vendorID: device.vendorID, productID: device.productID, name: device.name))
-        }
-        guard !infos.isEmpty else {
-            let item = menu.addItem(withTitle: NSLocalizedString("scrollDevicesNone", comment: "Shown when no mouse is connected"), action: nil, keyEquivalent: "")
-            item.isEnabled = false
-            return
-        }
-        for info in infos {
-            let saved = devices.get(by: info.identity)
-            let title = saved?.getName() ?? (info.name.isEmpty ? info.identity : info.name)
-            let item = menu.addItem(withTitle: title, action: #selector(deviceMenuItemClick(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = info.identity
-            item.toolTip = info.identity
-            // 勾选表示该设备存在覆盖
-            item.state = (saved?.overrides.isEmpty == false) ? .on : .off
-            deviceMenuInfos[info.identity] = info
-        }
-    }
-
-    @objc private func deviceMenuItemClick(_ sender: NSMenuItem) {
-        guard let identity = sender.representedObject as? String, let popUp = devicePopUpButton else { return }
-        let device: ScrollDevice
-        if let saved = Options.shared.device.devices.get(by: identity) {
-            device = saved
-        } else if let info = deviceMenuInfos[identity] {
-            device = ScrollDevice(info: info)
-            Options.shared.device.devices.append(device)
-        } else {
-            return
-        }
-        let controller = Utils.instantiateControllerFromStoryboard(withIdentifier: PANEL_IDENTIFIER.scrollingWithApplication) as PreferencesScrollingWithApplicationViewController
-        controller.updateTargetDevice(with: device)
-        present(controller, asPopoverRelativeTo: popUp.bounds, of: popUp, preferredEdge: NSRectEdge.maxX, behavior: NSPopover.Behavior.transient)
     }
 }

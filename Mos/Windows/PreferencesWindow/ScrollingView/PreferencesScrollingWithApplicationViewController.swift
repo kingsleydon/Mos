@@ -17,6 +17,8 @@ class PreferencesScrollingWithApplicationViewController: NSViewController {
     private var currentTargetApplication: Application?
     private var currentTargetDevice: ScrollDevice?
     private var currentContentViewController: PreferencesScrollingViewController?
+    // 关闭回调 (供列表刷新覆盖摘要)
+    var onClose: (() -> Void)?
     // UI Elements
     @IBOutlet weak var currentTargetApplicationIcon: NSImageView!
     @IBOutlet weak var currentTargetApplicationName: NSTextField!
@@ -30,7 +32,7 @@ class PreferencesScrollingWithApplicationViewController: NSViewController {
     override func viewDidLoad() {
         // 初始化显示内容
         if let device = currentTargetDevice {
-            currentTargetApplicationIcon.image = PreferencesScrollingWithApplicationViewController.deviceIcon()
+            currentTargetApplicationIcon.image = PreferencesApplicationViewController.deviceIcon()
             currentTargetApplicationIcon.toolTip = device.identity
             currentTargetApplicationName.stringValue = device.getName()
         } else {
@@ -46,10 +48,7 @@ class PreferencesScrollingWithApplicationViewController: NSViewController {
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
-        // 没有任何覆盖与自定义名称的设备无需保留
-        if let device = currentTargetDevice, device.overrides.isEmpty, (device.displayName ?? "").isEmpty {
-            Options.shared.device.devices.remove(from: device.identity)
-        }
+        onClose?()
     }
 
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
@@ -85,6 +84,9 @@ class PreferencesScrollingWithApplicationViewController: NSViewController {
         let name = sender.stringValue
         if let device = currentTargetDevice {
             device.displayName = name
+            if let validParentTableView = parentTableView, let validParentTableRow = parentTableRow {
+                validParentTableView.reloadData(forRowIndexes: [validParentTableRow], columnIndexes: [0])
+            }
             return
         }
         if name.count > 0 {
@@ -133,10 +135,4 @@ extension PreferencesScrollingWithApplicationViewController {
         }
     }
 
-    private static func deviceIcon() -> NSImage? {
-        if #available(macOS 11.0, *) {
-            return NSImage(systemSymbolName: "computermouse", accessibilityDescription: nil)
-        }
-        return NSImage(named: NSImage.computerName)
-    }
 }

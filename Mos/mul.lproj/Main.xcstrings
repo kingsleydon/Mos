@@ -2321,92 +2321,92 @@
       "localizations" : {
         "cs" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplikace"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ausnahmen"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "el" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Εφαρμογή"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Application"
+            "state" : "translated",
+            "value" : "Overrides"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Application"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アプリ"
+            "value" : "上書き設定"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "예외"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Исключения"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "th" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "แอปพลิเคชัน"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "tr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "İstisna"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Програма"
+            "state" : "needs_review",
+            "value" : "Overrides"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "应用程序"
+            "value" : "覆盖设置"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "例外"
+            "value" : "覆寫設定"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "應用程式"
+            "value" : "覆寫設定"
           }
         },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "應用程式"
+            "value" : "覆寫設定"
           }
         }
       }

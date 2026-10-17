@@ -1,7 +1,7 @@
 //
 //  PreferencesApplicationViewController.swift
 //  Mos
-//  分应用设置界面
+//  覆盖设置界面 (例外应用 / 例外设备)
 //  Created by Caldis on 2017/1/29.
 //  Copyright © 2017年 Caldis. All rights reserved.
 //
@@ -9,17 +9,31 @@
 import Cocoa
 
 class PreferencesApplicationViewController: NSViewController {
-    
+
+    // 列表类型
+    enum OverridesMode: Int {
+        case applications = 0
+        case devices = 1
+    }
+    private var mode = OverridesMode.applications
+
     // MARK: - UI Elements
     // 白名单
     @IBOutlet weak var allowlistModeCheckBox: NSButton!
+    @IBOutlet weak var allowlistHelpButton: NSButton?
     // 表格
     @IBOutlet weak var tableHead: NSVisualEffectView!
+    @IBOutlet weak var tableHeadTitle: NSTextField?
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var tableFoot: NSView!
     @IBOutlet weak var tableEmpty: NSView!
+    @IBOutlet weak var tableEmptyTitle: NSTextField?
+    @IBOutlet weak var tableEmptyDescription: NSTextField?
+    @IBOutlet weak var tableEmptyImage: NSImageView?
     // 按钮
     @IBOutlet weak var createButton: PrimaryButton!
+    @IBOutlet weak var createButtonTitle: NSTextField?
+    @IBOutlet weak var createButtonDescription: NSTextField?
     @IBOutlet weak var addButton: NSButton!
     @IBOutlet weak var delButton: NSButton!
     // 选项菜单
@@ -27,6 +41,14 @@ class PreferencesApplicationViewController: NSViewController {
     @IBOutlet weak var runningAndInstalledManuItem: NSMenuItem!
     private var runningAndInstalledMenuChildrenContainer: NSMenu!
     @IBOutlet weak var manuallySelectFromFinderMenuItem: NSMenuItem!
+    // 类型切换 (代码创建)
+    private let modeControl = NSSegmentedControl()
+    // 设备菜单
+    private let deviceSourceMenu = NSMenu(title: "")
+    private var deviceMenuInfos: [String: PointingDeviceInfo] = [:]
+    // Storyboard 中已本地化的应用文案, 切回应用列表时还原
+    private var applicationTexts: [NSTextField: String] = [:]
+    private var applicationEmptyImage: NSImage?
 
     override func viewDidLoad() {
         // 为 "Running Applications" 菜单项动态创建 submenu (避免 Storyboard 中的 menu 父子关系警告)
@@ -37,40 +59,48 @@ class PreferencesApplicationViewController: NSViewController {
         Utils.attachImage(to: manuallySelectFromFinderMenuItem, withImage: #imageLiteral(resourceName: "SF.tray"))
         // 设置表格代理
         tableView.delegate = self
+        // 类型切换
+        setupModeControl()
+        for field in [tableHeadTitle, tableEmptyTitle, tableEmptyDescription, createButtonTitle, createButtonDescription] {
+            if let field = field { applicationTexts[field] = field.stringValue }
+        }
+        applicationEmptyImage = tableEmptyImage?.image
         // 读取设置
         syncViewWithOptions()
         // 初始化按钮状态
         updateDelButtonState()
     }
     override func viewWillAppear() {
+        // 设备可能在面板外被识别, 每次显示时刷新
+        tableView.reloadData()
         // 检查表格数据
         toggleNoDataHint()
         // 设置添加按钮回调
         setupAddButtonCallback()
     }
-    
+
     // 主添加按钮
     private func setupAddButtonCallback() {
         createButton.onMouseDown = { [weak self] _ in
             guard let self = self else { return }
             guard let sender = self.createButton else { return }
             let position = NSPoint(x: sender.frame.origin.x - 40, y: sender.frame.origin.y - 44)
-            self.openRunningApplicationPanel(sender, position)
+            self.openSourceMenu(sender, position)
             self.tableView.reloadData()
         }
     }
-    
+
     // 白名单模式
     @IBAction func allowListModeClick(_ sender: NSButton) {
         Options.shared.application.allowlist = sender.state.rawValue==0 ? false : true
         syncViewWithOptions()
     }
-    
+
     // 列表底部按钮
     @IBAction func addItemClick(_ sender: NSButton) {
         // 添加
         let position = NSPoint(x: sender.frame.origin.x - 3, y: sender.frame.origin.y + 10)
-        openRunningApplicationPanel(sender, position)
+        openSourceMenu(sender, position)
         // 重新加载
         tableView.reloadData()
     }
@@ -84,13 +114,88 @@ class PreferencesApplicationViewController: NSViewController {
         // 确保选择了行
         guard tableView.selectedRow != -1 else { return }
         // 删除 (appScroll 用量清理由 LogiUsageBootstrap 的 Options 订阅自动完成)
-        Options.shared.application.applications.remove(at: tableView.selectedRow)
+        switch mode {
+        case .applications:
+            Options.shared.application.applications.remove(at: tableView.selectedRow)
+        case .devices:
+            Options.shared.device.devices.remove(at: tableView.selectedRow)
+        }
         // 重新加载
         tableView.reloadData()
         // 立即更新空状态显示
         toggleNoDataHint()
         // 更新删除按钮状态
         updateDelButtonState()
+    }
+
+    private func openSourceMenu(_ targetView: NSView, _ targetPosition: NSPoint) {
+        switch mode {
+        case .applications:
+            openRunningApplicationPanel(targetView, targetPosition)
+        case .devices:
+            openConnectedDevicePanel(targetView, targetPosition)
+        }
+    }
+}
+
+/**
+ * 类型切换
+ **/
+extension PreferencesApplicationViewController {
+
+    private func setupModeControl() {
+        modeControl.segmentCount = 2
+        modeControl.setLabel(NSLocalizedString("overridesApplicationsSegment", comment: "Segment title for per-application overrides"), forSegment: OverridesMode.applications.rawValue)
+        modeControl.setLabel(NSLocalizedString("overridesDevicesSegment", comment: "Segment title for per-device overrides"), forSegment: OverridesMode.devices.rawValue)
+        modeControl.segmentStyle = .rounded
+        modeControl.controlSize = .small
+        modeControl.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+        modeControl.trackingMode = .selectOne
+        modeControl.selectedSegment = mode.rawValue
+        modeControl.target = self
+        modeControl.action = #selector(modeControlChange(_:))
+        modeControl.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(modeControl)
+        // 表头与空状态视图在 Storyboard 中已为切换控件预留顶部空间
+        NSLayoutConstraint.activate([
+            modeControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            modeControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+        ])
+    }
+
+    @objc private func modeControlChange(_ sender: NSSegmentedControl) {
+        guard let nextMode = OverridesMode(rawValue: sender.selectedSegment), nextMode != mode else { return }
+        mode = nextMode
+        tableView.deselectAll(nil)
+        tableView.reloadData()
+        syncViewWithOptions()
+        toggleNoDataHint()
+        updateDelButtonState()
+    }
+
+    /// 按当前类型切换文案; 应用文案沿用 Storyboard 中的本地化结果
+    private func updateModeTexts() {
+        switch mode {
+        case .applications:
+            for (field, text) in applicationTexts { field.stringValue = text }
+            tableEmptyImage?.image = applicationEmptyImage
+        case .devices:
+            tableHeadTitle?.stringValue = NSLocalizedString("overridesDeviceColumn", comment: "Column title of the per-device overrides list")
+            tableEmptyTitle?.stringValue = NSLocalizedString("overridesNoDeviceTitle", comment: "Empty state title of the per-device overrides list")
+            tableEmptyDescription?.stringValue = NSLocalizedString("overridesNoDeviceDescription", comment: "Empty state description of the per-device overrides list")
+            createButtonTitle?.stringValue = NSLocalizedString("overridesAddDevice", comment: "Primary button title to add a per-device override")
+            createButtonDescription?.stringValue = NSLocalizedString("overridesAddDeviceDescription", comment: "Primary button description to add a per-device override")
+            if let image = PreferencesApplicationViewController.deviceIcon() {
+                tableEmptyImage?.image = image
+            }
+        }
+    }
+
+    static func deviceIcon() -> NSImage? {
+        if #available(macOS 11.0, *) {
+            return NSImage(systemSymbolName: "computermouse", accessibilityDescription: nil)
+        }
+        return NSImage(named: NSImage.computerName)
     }
 }
 
@@ -100,10 +205,13 @@ class PreferencesApplicationViewController: NSViewController {
 extension PreferencesApplicationViewController {
     // 同步界面与设置参数
     func syncViewWithOptions() {
-        // 白名单
+        // 白名单仅作用于应用
         allowlistModeCheckBox.state = NSControl.StateValue(rawValue: Options.shared.application.allowlist ? 1 : 0)
+        allowlistModeCheckBox.isHidden = mode != .applications
+        allowlistHelpButton?.isHidden = mode != .applications
+        updateModeTexts()
     }
-    
+
     // 更新删除按钮状态
     func updateDelButtonState() {
         delButton.isEnabled = tableView.selectedRow != -1
@@ -119,9 +227,15 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         static let applicationCell = "applicationCell"
         static let scrollingCell = "scrollingCell"
     }
+    private var currentItemCount: Int {
+        switch mode {
+        case .applications: return Options.shared.application.applications.count
+        case .devices: return Options.shared.device.devices.count
+        }
+    }
     // 切换无数据显示
     func toggleNoDataHint() {
-        let hasData = Options.shared.application.applications.count != 0
+        let hasData = currentItemCount != 0
         updateViewVisibility(view: createButton, visible: !hasData)
         updateViewVisibility(view: tableEmpty, visible: !hasData)
         updateViewVisibility(view: tableHead, visible: hasData)
@@ -138,25 +252,43 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         // 从 SB 构建内容
         let scrollingWithApplicationViewController = Utils.instantiateControllerFromStoryboard(withIdentifier: PANEL_IDENTIFIER.scrollingWithApplication) as PreferencesScrollingWithApplicationViewController
         // 更新目标数据
-        scrollingWithApplicationViewController.updateTargetApplication(with: Options.shared.application.applications.get(by: row))
+        switch mode {
+        case .applications:
+            scrollingWithApplicationViewController.updateTargetApplication(with: Options.shared.application.applications.get(by: row))
+        case .devices:
+            scrollingWithApplicationViewController.updateTargetDevice(with: Options.shared.device.devices.get(by: row))
+        }
         scrollingWithApplicationViewController.updateParentData(with: tableView, for: row)
+        // 关闭后刷新该行的覆盖摘要
+        scrollingWithApplicationViewController.onClose = { [weak self] in
+            guard let self = self, row < self.currentItemCount else { return }
+            self.tableView.reloadData(forRowIndexes: [row], columnIndexes: [0])
+        }
         // 展示到指定位置
         present(scrollingWithApplicationViewController, asPopoverRelativeTo: sender.bounds, of: sender, preferredEdge: NSRectEdge.maxX, behavior: NSPopover.Behavior.transient)
     }
     // 构建表格数据 (循环生成行)
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         guard let tableColumnIdentifier = tableColumn?.identifier,
-              let cell = tableView.makeView(withIdentifier: tableColumnIdentifier, owner: self) as? NSTableCellView,
-              let application = Options.shared.application.applications.get(by: row) else {
+              let cell = tableView.makeView(withIdentifier: tableColumnIdentifier, owner: self) as? NSTableCellView else {
             return nil
         }
         // 生成每行的 Cell
         switch tableColumnIdentifier.rawValue {
-            // 应用
+            // 应用 / 设备
             case CellIdentifiers.applicationCell:
-                cell.imageView?.image = application.getIcon()
-                cell.imageView?.toolTip = application.path
-                cell.textField?.stringValue = application.getName()
+                switch mode {
+                case .applications:
+                    guard let application = Options.shared.application.applications.get(by: row) else { return nil }
+                    cell.imageView?.image = application.getIcon()
+                    cell.imageView?.toolTip = application.path
+                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(application.getName(), summary: application.overrideSummary())
+                case .devices:
+                    guard let device = Options.shared.device.devices.get(by: row) else { return nil }
+                    cell.imageView?.image = PreferencesApplicationViewController.deviceIcon()
+                    cell.imageView?.toolTip = device.identity
+                    cell.textField?.attributedStringValue = PreferencesApplicationViewController.title(device.getName(), summary: device.overrideSummary())
+                }
                 return cell
             // 设定: 滚动
             case CellIdentifiers.scrollingCell:
@@ -169,15 +301,30 @@ extension PreferencesApplicationViewController: NSTableViewDelegate, NSTableView
         }
         return nil
     }
+    /// 名称 + 覆盖摘要 (次要文字色)
+    private static func title(_ name: String, summary: String) -> NSAttributedString {
+        let result = NSMutableAttributedString(string: name, attributes: [
+            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
+            .foregroundColor: NSColor.controlTextColor,
+        ])
+        result.append(NSAttributedString(string: "  " + summary, attributes: [
+            .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
+            .foregroundColor: NSColor.secondaryLabelColor,
+        ]))
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.lineBreakMode = .byTruncatingTail
+        result.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: result.length))
+        return result
+    }
     // 行高
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
         return 30
     }
     // 行数
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return Options.shared.application.applications.count
+        return currentItemCount
     }
-    
+
     // 选择变化
     func tableViewSelectionDidChange(_ notification: Notification) {
         updateDelButtonState()
@@ -237,7 +384,7 @@ extension PreferencesApplicationViewController: NSMenuDelegate {
         // 显示菜单
         applicationSourceMenuControl.popUp(positioning: nil, at: targetPosition, in: targetView)
     }
-    
+
     // 添加应用
     func appendApplicationWith(path: String) {
         let application = Application(path: path)
@@ -249,5 +396,42 @@ extension PreferencesApplicationViewController: NSMenuDelegate {
         guard let runningApplication = sender.representedObject as? NSRunningApplication else { return }
         guard let executablePath = runningApplication.executableURL?.path else { return }
         appendApplicationWith(path: executablePath)
+    }
+
+    // 已连接的鼠标菜单 (最近滚动过的排在最前, 已添加的不可选)
+    func openConnectedDevicePanel(_ targetView: NSView, _ targetPosition: NSPoint) {
+        deviceSourceMenu.removeAllItems()
+        var infos = PointingDeviceRegistry.shared.connectedMice()
+        if let last = PointingDeviceRegistry.shared.lastScrollDevice {
+            infos.removeAll { $0.identity == last.identity }
+            infos.insert(last, at: 0)
+        }
+        if infos.isEmpty {
+            let item = deviceSourceMenu.addItem(withTitle: NSLocalizedString("scrollDevicesNone", comment: "Shown when no mouse is connected"), action: nil, keyEquivalent: "")
+            item.isEnabled = false
+        }
+        for info in infos {
+            let isExist = Options.shared.device.devices.get(by: info.identity) != nil
+            let item = Utils.addMenuItem(
+                to: deviceSourceMenu,
+                title: info.name.isEmpty ? info.identity : info.name,
+                icon: PreferencesApplicationViewController.deviceIcon(),
+                action: #selector(appendDeviceWithConnectedDevice),
+                target: isExist ? nil : self,
+                represent: info.identity
+            )
+            item.toolTip = info.identity
+        }
+        deviceMenuInfos = Dictionary(infos.map { ($0.identity, $0) }, uniquingKeysWith: { first, _ in first })
+        deviceSourceMenu.popUp(positioning: nil, at: targetPosition, in: targetView)
+    }
+
+    @objc func appendDeviceWithConnectedDevice(_ sender: NSMenuItem!) {
+        guard let identity = sender.representedObject as? String,
+              let info = deviceMenuInfos[identity],
+              Options.shared.device.devices.get(by: identity) == nil else { return }
+        Options.shared.device.devices.append(ScrollDevice(info: info))
+        tableView.reloadData()
+        toggleNoDataHint()
     }
 }

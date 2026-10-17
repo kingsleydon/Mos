@@ -27,7 +27,17 @@ import Cocoa
 class PreferencesTabViewController: NSTabViewController {
     
     let backgroundVisualEffectView = NSVisualEffectView()
-    
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // 覆盖设置 (应用 + 设备): 系统支持时使用分层图标
+        if #available(macOS 13.0, *),
+           let item = tabViewItems.first(where: { ($0.identifier as? String) == PANEL_IDENTIFIER.application }),
+           let image = NSImage(systemSymbolName: "square.3.layers.3d", accessibilityDescription: nil) {
+            item.image = image
+        }
+    }
+
     override func viewDidAppear() {
         // 移除已有约束
         view.removeConstraints(view.constraints)
