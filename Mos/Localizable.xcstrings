@@ -16795,6 +16795,101 @@
           }
         }
       }
+    },
+    "deviceHotkeysFollowGlobalNote": {
+      "comment": "Note in the device settings popover explaining that dash/toggle/block keys cannot be set per device",
+      "localizations": {
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifikační klávesy nelze nastavit pro jednotlivá zařízení. Řídí se nastavením aplikace nebo globálním nastavením."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sondertasten können nicht pro Gerät festgelegt werden. Sie folgen den App- oder globalen Einstellungen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα πλήκτρα τροποποίησης δεν ορίζονται ανά συσκευή. Ακολουθούν τις ρυθμίσεις της εφαρμογής ή τις γενικές."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifier keys can't be set per device. They follow the app or global settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les touches de modification ne peuvent pas être définies par appareil. Elles suivent les réglages de l’app ou globaux."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修飾キーはデバイスごとに設定できません。アプリまたはグローバル設定に従います。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보조 키는 기기별로 설정할 수 없습니다. 앱 또는 전역 설정을 따릅니다."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Клавиши-модификаторы нельзя задать для отдельного устройства. Они следуют настройкам приложения или глобальным."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่สามารถตั้งค่าปุ่มปรับแต่งแยกตามอุปกรณ์ได้ โดยจะใช้ตามการตั้งค่าของแอปหรือส่วนกลาง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Değiştirici tuşlar cihaz bazında ayarlanamaz. Uygulama veya evrensel ayarları izler."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Клавіші-модифікатори не можна задати для окремого пристрою. Вони відповідають налаштуванням програми або глобальним."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修饰键无法按设备单独设置，沿用应用或全局设定。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修飾鍵無法依裝置單獨設定，沿用應用程式或全域設定。"
+          }
+        },
+        "zh-Hant-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修飾鍵無法依裝置單獨設定，沿用應用程式或全域設定。"
+          }
+        },
+        "zh-Hant-TW": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修飾鍵無法依裝置單獨設定，沿用應用程式或全域設定。"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

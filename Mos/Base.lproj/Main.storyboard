@@ -1559,6 +1559,7 @@
                         </constraints>
                     </visualEffectView>
                     <connections>
+                        <outlet property="blockDescriptionLabel" destination="1eQ-Un-ZLh" id="Apz-y7-XCf"/>
                         <outlet property="blockLabel" destination="kMQ-Oj-Bvd" id="eRq-XW-CZO"/>
                         <outlet property="dashLabel" destination="mKO-0m-Vb0" id="mhA-MR-7OU"/>
                         <outlet property="durationLabel" destination="z8H-6h-kRv" id="xze-J0-t5s"/>

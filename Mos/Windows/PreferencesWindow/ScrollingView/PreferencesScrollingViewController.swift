@@ -26,6 +26,7 @@ class PreferencesScrollingViewController: NSViewController, ScrollOptionsContext
     @IBOutlet weak var dashLabel: NSTextField?
     @IBOutlet weak var toggleLabel: NSTextField?
     @IBOutlet weak var blockLabel: NSTextField?
+    @IBOutlet weak var blockDescriptionLabel: NSTextField?
     @IBOutlet weak var stepLabel: NSTextField?
     @IBOutlet weak var speedLabel: NSTextField?
     @IBOutlet weak var durationLabel: NSTextField?
@@ -416,7 +417,37 @@ extension PreferencesScrollingViewController {
         guard currentScrollProfile != nil else { return }
         resetToDefaultsButton.title = NSLocalizedString("resetToGlobalSettings", comment: "Button that removes every override of an app or device so it follows the global settings")
         setupInheritButtons()
+        setupDeviceHotkeyNote()
     }
+
+    /// 设备上下文: 在热键区下方说明热键不随设备区分 (三行被禁用时不至于看起来像故障)
+    private func setupDeviceHotkeyNote() {
+        guard currentTargetDevice != nil,
+              view.subviews.first(where: { $0.identifier == PreferencesScrollingViewController.deviceHotkeyNoteIdentifier }) == nil,
+              let anchor = blockDescriptionLabel,
+              let separatorTop = view.constraints.first(where: {
+                  $0.secondItem === anchor && $0.secondAttribute == .bottom && $0.firstAttribute == .top
+              }),
+              let separator = separatorTop.firstItem as? NSView else {
+            return
+        }
+        let note = NSTextField(labelWithString: NSLocalizedString("deviceHotkeysFollowGlobalNote", comment: "Note in the device settings popover explaining that dash/toggle/block keys cannot be set per device"))
+        note.identifier = PreferencesScrollingViewController.deviceHotkeyNoteIdentifier
+        note.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+        note.textColor = NSColor.secondaryLabelColor
+        note.lineBreakMode = .byWordWrapping
+        note.preferredMaxLayoutWidth = 240
+        note.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(note)
+        separatorTop.isActive = false
+        NSLayoutConstraint.activate([
+            note.topAnchor.constraint(equalTo: anchor.bottomAnchor, constant: 12),
+            note.leadingAnchor.constraint(equalTo: anchor.leadingAnchor),
+            note.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -20),
+            separator.topAnchor.constraint(equalTo: note.bottomAnchor, constant: 20),
+        ])
+    }
+    private static let deviceHotkeyNoteIdentifier = NSUserInterfaceItemIdentifier("deviceHotkeyNote")
 
     /// 覆盖层上下文中, 在每行标题文字左侧放置 "恢复为全局设定" 按钮 (仅已覆盖时可见)
     private func setupInheritButtons() {
