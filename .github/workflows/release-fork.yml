@@ -1,14 +1,14 @@
 name: Release Fork Build
 
-# 手动触发: 构建 Release 配置的 Mos.app (ad-hoc 签名, 不公证, 不含 Sparkle 更新源),
+# 推送 v*-fork.* 标签触发: 构建 Release 配置的 Mos.app (ad-hoc 签名, 不公证, 不含 Sparkle 更新源),
 # 并创建 GitHub 草稿 Release. 发布草稿由人工在 GitHub 上完成.
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version shown in About, e.g. 4.3.0-fork.1"
-        required: true
-        default: "4.3.0-fork.1"
+  push:
+    tags:
+      - "v*-fork.*"
+
+env:
+  VERSION: ${{ github.ref_name }}
 
 permissions:
   contents: write
@@ -28,7 +28,7 @@ jobs:
             -derivedDataPath build/DerivedData \
             CODE_SIGN_IDENTITY=- 'CODE_SIGN_IDENTITY[sdk=macosx*]=-' CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS=MOS_FORK_BUILD \
-            MARKETING_VERSION="${{ inputs.version }}" \
+            MARKETING_VERSION="${VERSION#v}" \
             build
 
       # 去掉上游更新源, 再重新做 ad-hoc 签名 (修改 Info.plist 会使签名失效)
@@ -44,17 +44,16 @@ jobs:
 
       - name: Package
         run: |
-          ditto -c -k --keepParent "build/DerivedData/Build/Products/Release/Mos.app" "build/Mos-${{ inputs.version }}.zip"
-          shasum -a 256 "build/Mos-${{ inputs.version }}.zip"
+          ditto -c -k --keepParent "build/DerivedData/Build/Products/Release/Mos.app" "build/Mos-${VERSION#v}.zip"
+          shasum -a 256 "build/Mos-${VERSION#v}.zip"
 
       - name: Create draft release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v${{ inputs.version }}" "build/Mos-${{ inputs.version }}.zip" \
+          gh release create "${{ github.ref_name }}" "build/Mos-${VERSION#v}.zip" \
             --repo "${{ github.repository }}" \
-            --target "${{ github.sha }}" \
-            --title "Mos ${{ inputs.version }}" \
+            --title "Mos ${VERSION#v}" \
             --draft --prerelease \
             --notes "Fork build of Mos with per-device scroll overrides, per-setting inheritance, and per-app/per-device on/off.
 
